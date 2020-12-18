@@ -6,7 +6,7 @@ import styles from "./index.less";
 import { RouterMenuPropsType, RouterCheckboxValueType, } from './data.d';
 
 
-const HeaderMenu: React.FC<RouterMenuPropsType> = (props) => {
+const RouterMenu: React.FC<RouterMenuPropsType> = (props) => {
   const [checkedMenus, setCheckedMenus] = useState<RouterCheckboxValueType[]>([]);
 
 
@@ -129,4 +129,4 @@ const HeaderMenu: React.FC<RouterMenuPropsType> = (props) => {
   )
 }
 
-export default HeaderMenu
+export default RouterMenu

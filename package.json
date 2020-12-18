@@ -1,5 +1,5 @@
 {
-  "name": "@gzmpc/ant-design-exframework",
+  "name": "ant-design-exframework",
   "version": "1.0.0",
   "description": "exframework for front ( base on antd )",
   "main": "index.js",
@@ -13,6 +13,10 @@
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/88fantasy/exframework-front.git"
+  },
   "keywords": [
     "exframework",
     "front",
@@ -20,6 +24,10 @@
   ],
   "author": "rwe",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/88fantasy/exframework-front/issues"
+  },
+  "homepage": "https://github.com/88fantasy/exframework-front#readme",
   "files": [
     "dist",
     "lib"
