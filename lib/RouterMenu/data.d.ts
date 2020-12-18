@@ -1,15 +1,32 @@
+import {
+  MenuDataItem, 
+} from '@ant-design/pro-layout';
 
-export interface RouterMenuItem {
-  name: string;
-  path: string;
-  icon: string;
-  children?: [];
+import {
+  CheckboxValueType, 
+} from 'antd/lib/checkbox/Group';
+
+
+
+export interface RouterMenuItem extends MenuDataItem {
+  /**
+   * @_target 跳转地址
+   */
+ _target?: string;
+ children?: RouterMenuItem[];
 }
 
+export interface RouterCheckboxValueType extends CheckboxValueType {
+
+}
 
 export interface RouterMenuPropsType{
+  title?: string;
   menuData: RouterMenuItem[],
-  itemClick: (path: string, item: any) => void;
+  showEdit?: boolean;
+  itemClick: (path: string | undefined, item: RouterMenuItem) => void;
+  onSave?: ( menus: RouterCheckboxValueType[] ) => void;
+  onCancel?: () => void;
 }
 
 export interface RouterMenuStateType{
