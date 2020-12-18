@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "target": "ES5",
+    "target": "ESNext",
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
     "resolveJsonModule": true,
@@ -20,8 +20,8 @@
     "skipLibCheck": true,
     "noUnusedLocals": true,
     "declaration": true,
-    "outDir": "dist"
+    "outDir": "lib"
   },
-  "include": ["*.d.ts", "lib"],
-  "exclude": ["node_modules", "dist", "build"]
+  "include": ["*.d.ts", "src" ],
+  "exclude": ["node_modules", "lib", "build"]
 }
