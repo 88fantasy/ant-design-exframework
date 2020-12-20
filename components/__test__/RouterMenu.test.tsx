@@ -6,10 +6,10 @@ describe('RouterMenu', () => {
   it('renders correctly', () => {
     // const wrapper = shallow(
     //   <RouterMenu
-    //       menuData={[]} 
+    //       menuData={[]}
     //       itemClick={
     //         (path , item) => {
-             
+
     //         }
     //       }
     //     />,
