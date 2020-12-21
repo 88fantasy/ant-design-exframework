@@ -22,164 +22,164 @@
 @router-menu-cls: ~'router-menu';
 
 .@{router-menu-cls} {
-  color: white;
-  user-select: none;
 
   &-menuListWrapper {
     position: relative;
     font-size: 18px;
     display: flex;
 
-    &-menuIcon {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 10px;
-      cursor: pointer;
+  }
 
+  &-menuIcon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    cursor: pointer;
+
+    &::before {
+      content: '';
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 0;
+      width: 0;
+      border: 10px solid;
+      border-color: transparent transparent white;
+      z-index: 99;
+    }
+
+    &.show {
       &::before {
-        content: '';
-        display: none;
-        position: absolute;
-        top: 60px;
-        left: 50%;
-        transform: translateX(-50%);
-        height: 0;
-        width: 0;
-        border: 10px solid;
-        border-color: transparent transparent white;
-        z-index: 99;
+        display: block;
       }
+    }
 
-      &.show {
-        &::before {
-          display: block;
-        }
-      }
+    &-iconAdd,
+    &-iconDefault {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      background: no-repeat center center / contain;
+    }
 
-      &-iconAdd,
-      &-iconDefault {
-        width: 20px;
-        height: 20px;
-        margin-right: 8px;
-        background: no-repeat center center / contain;
-      }
+    &-iconAdd {
+      background-image: url('../assets/menuAdd.png');
+    }
 
-      &-iconAdd {
-        background-image: url('../assets/menuAdd.png');
-      }
-
-      &-iconDefault {
-        background-image: url('../assets/menu.png')
-      }
+    &-iconDefault {
+      background-image: url('../assets/menu.png')
     }
   }
 
   &-menuPopup {
-    position: absolute;
-    left: -20px;
-    top: 80px;
     padding: 20px 40px 40px;
     background-color: white;
     color: black;
     border-radius: 10px;
-    width: 60vw;
-    max-width: 800px;
+    width: 70vw;
+    max-width: 1000px;
     z-index: 9;
     box-shadow: 0px 1px 30px 0px rgba(4, 0, 0, 0.09);
+  }
 
-    &-menuHeader {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
+  &-menuHeader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
 
-      &-buttonWrapper {
-        margin-left: 20px;
+  }
 
-        span {
-          display: inline-block;
-          line-height: 20px;
-          font-size: 14px;
-          padding: 3px 15px;
-          border-radius: 5px;
-          border: 1px solid @dashboard-title-gray;
-          color: @dashboard-title-gray;
-          margin-right: 10px;
-          cursor: pointer;
+  &-buttonWrapper {
+    margin-left: 20px;
 
-          &.save {
-            background-color: @headerMenu-blue;
-            color: white;
-          }
-        }
+    span {
+      display: inline-block;
+      line-height: 20px;
+      font-size: 14px;
+      padding: 3px 15px;
+      border-radius: 5px;
+      border: 1px solid @dashboard-title-gray;
+      color: @dashboard-title-gray;
+      margin-right: 10px;
+      cursor: pointer;
+
+      &.save {
+        background-color: @headerMenu-blue;
+        color: white;
       }
     }
+  }
 
-    &-menuWrapper {
-      display: flex;
-      flex-wrap: wrap;
+  &-menuWrapper {
+    display: flex;
+    flex-wrap: wrap;
 
-      &-menuItemWrapper {
-        margin-right: 80px;
-        width: 150px;
+  }
 
-        &-menuItemHeader {
-          display: flex;
-          align-items: center;
-          border-bottom: 1px solid #CCCCCC;
+  &-menuItemWrapper {
+    margin-right: 80px;
+    width: 150px;
 
-          :global {
-            .anticon {
-              font-size: 20px;
-              margin-right: 10px;
-              color: #4E83C6;
-            }
-          }
+  }
 
-          &-menuItemHeaderName {
-            font-weight: bold;
-            font-size: 18px;
-            line-height: 40px;
-          }
-        }
+  &-menuItemHeader {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #CCCCCC;
 
-        &-menuItemContent {
-          display: flex;
-          flex-direction: column;
-          margin-top: 10px;
-          cursor: pointer;
+    :global {
+      .anticon {
+        font-size: 20px;
+        margin-right: 10px;
+        color: #4E83C6;
+      }
+    }
+  }
 
-          span {
-            font-size: 14px;
-            line-height: 28px;
+  &-menuItemHeaderName {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 40px;
+  }
 
-            &:hover {
-              color: @login-blue;
-            }
-          }
-        }
 
-        &-menuCheckboxContent {
-          display: flex;
-          flex-direction: column;
-          margin-top: 10px;
-          font-size: 14px;
+  &-menuItemContent {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    cursor: pointer;
 
-          :global {
-            .ant-checkbox-wrapper {
-              display: flex;
-              flex-direction: row-reverse;
-              justify-content: space-between;
-              align-items: center;
-              cursor: pointer;
-              text-align: right;
+    span {
+      font-size: 14px;
+      line-height: 28px;
 
-              &+.ant-checkbox-wrapper {
-                margin: 0;
-              }
-            }
-          }
+      &:hover {
+        color: @login-blue;
+      }
+    }
+  }
+
+  &-menuCheckboxContent {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    font-size: 14px;
+
+    :global {
+      .ant-checkbox-wrapper {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        text-align: right;
+
+        &+.ant-checkbox-wrapper {
+          margin: 0;
         }
       }
     }
