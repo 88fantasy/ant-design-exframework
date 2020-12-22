@@ -168,25 +168,19 @@
     flex-direction: column;
     margin-top: 10px;
     font-size: 14px;
+  }
 
-    :global {
-      .ant-checkbox-wrapper {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        text-align: right;
-
-        &+.ant-checkbox-wrapper {
-          margin: 0;
-        }
-      }
-    }
+  &-menuCheckboxItem {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: right;
   }
 
 
-  &-disableBox {
+  &-disabledBox {
     :global {
       .ant-popover-inner {
         background-color: transparent;

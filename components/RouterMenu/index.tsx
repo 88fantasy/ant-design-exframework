@@ -32,7 +32,7 @@ const RouterMenu: React.FC<RouterMenuPropsType> = (props) => {
   const prefixCls = 'router-menu';
 
   const { menuData, itemClick, title = "菜单", showEdit = false,
-    onSave, onCancel, 
+    onSave, onCancel,
     // className,
   } = props;
 
@@ -93,8 +93,8 @@ const RouterMenu: React.FC<RouterMenuPropsType> = (props) => {
               固定至导航栏（{checkedMenus.length}/{totalNum}）
                   </div>
             <div className={`${prefixCls}-buttonWrapper`}>
-              <span className={`${prefixCls}`} onClick={() => onSave && onSave(checkedMenus)} >保存</span>
-              <span className={`${prefixCls}`} onClick={() => onCancel && onCancel()}>取消</span>
+              <span className="save" onClick={() => onSave && onSave(checkedMenus)} >保存</span>
+              <span className="cancel" onClick={() => onCancel && onCancel()}>取消</span>
             </div>
           </div>
         ) : null
@@ -111,41 +111,49 @@ const RouterMenu: React.FC<RouterMenuPropsType> = (props) => {
                     {/* <img  className={`${prefixCls}-menuItemHeaderIcon`}></img> */}
                     <span className={`${prefixCls}-menuItemHeaderName`}>{name}</span>
                   </div>
-                  <div>
-                    {
-                      showEdit ? (
-                        <div >
-                          <Checkbox.Group className={`${prefixCls}-menuCheckboxContent`} onChange={handleCheckchange}>
-                            {
-                              !hideChildrenInMenu && children.length ? children.map((childItem) => {
-                                const { path: childPath, name: childName, key: childKey, _target: childTarget } = childItem
-                                return childName ? (
-                                  <Checkbox key={childKey} value={childPath}>{childName}{childTarget ? <ShareAltOutlined /> : null}</Checkbox>
-                                  // <span key={childIndex} onClick={() => { handleCheck(childPath) }}>{childName}</span>
-                                ) : null
-                              }) : (
-                                  // <span onClick={() => { handleCheck(path) }}>yes</span>
-                                  <Checkbox value={path}>{name}{_target ? <ShareAltOutlined /> : null}</Checkbox>
-                                )
-                            }
-                          </Checkbox.Group>
+                  {
+                    showEdit ? (
+                      <Checkbox.Group style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        marginTop: '10px',
+                      }} onChange={handleCheckchange}>
+                        {
+                          !hideChildrenInMenu && children.length ? children.map((childItem) => {
+                            const { path: childPath, name: childName, key: childKey, _target: childTarget } = childItem
+                            return childName ? (
+                              <Checkbox key={childKey} value={childPath} style={{
+                                display: 'flex',
+                                flexDirection : 'row-reverse',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                                textAlign: 'right',
+                                margin: '0',
+                              }} >{childName}{childTarget ? <ShareAltOutlined /> : null}</Checkbox>
+                              // <span key={childIndex} onClick={() => { handleCheck(childPath) }}>{childName}</span>
+                            ) : null
+                          }) : (
+                              // <span onClick={() => { handleCheck(path) }}>yes</span>
+                              <Checkbox value={path}>{name}{_target ? <ShareAltOutlined /> : null}</Checkbox>
+                            )
+                        }
+                      </Checkbox.Group>
+                    ) : (
+                        <div className={`${prefixCls}-menuItemContent`}>
+                          {
+                            !hideChildrenInMenu && children.length ? children.map((childItem) => {
+                              const { path: childPath, name: childName, key: childKey, _target: childTarget } = childItem
+                              return childName ? (
+                                <span key={childKey} onClick={() => { itemClick(childPath, childItem) }}>{childName}{childTarget ? <ShareAltOutlined /> : null}</span>
+                              ) : null
+                            }) : (
+                                <span onClick={() => { itemClick(path, item) }}>{name}{_target ? <ShareAltOutlined /> : null}</span>
+                              )
+                          }
                         </div>
-                      ) : (
-                          <div className={`${prefixCls}-menuItemContent`}>
-                            {
-                              !hideChildrenInMenu && children.length ? children.map((childItem) => {
-                                const { path: childPath, name: childName, key: childKey, _target: childTarget } = childItem
-                                return childName ? (
-                                  <span key={childKey} onClick={() => { itemClick(childPath, childItem) }}>{childName}{childTarget ? <ShareAltOutlined /> : null}</span>
-                                ) : null
-                              }) : (
-                                  <span onClick={() => { itemClick(path, item) }}>{name}{_target ? <ShareAltOutlined /> : null}</span>
-                                )
-                            }
-                          </div>
-                        )
-                    }
-                  </div>
+                      )
+                  }
                 </div >
               )
             }
@@ -157,7 +165,7 @@ const RouterMenu: React.FC<RouterMenuPropsType> = (props) => {
   );
 
   return (
-    <Popover content={menuConetent} placement="bottom" overlayClassName={`${prefixCls}-disableBox`} >
+    <Popover content={menuConetent} placement="bottom" overlayClassName={`${prefixCls}-disabledBox`} >
       {title} <DownOutlined />
     </Popover>
   )
