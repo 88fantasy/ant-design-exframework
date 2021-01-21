@@ -17,17 +17,17 @@ const layout = {
   },
 };
 const op = {
-  OPER_EQUAL: "equal",
-  OPER_GREATER: "greater",
-  OPER_LESS: "less",
-  OPER_BETWEEN: "between",
-  OPER_GREATER_EQUAL: "greater_equal",
-  OPER_LESS_EQUAL: "less_equal",
-  OPER_IN: "in",
-  OPER_MATCHING: "matching",
-  OPER_NOT_EQUAL: "not_equal",
-  OPER_ISNULL: "is_null",
-  OPER_STR: "str",
+  OPER_EQUAL: "EQUAL",
+  OPER_GREATER: "GREATER",
+  OPER_LESS: "LESS",
+  OPER_BETWEEN: "BETWEEN",
+  OPER_GREATER_EQUAL: "GREATER_EQUAL",
+  OPER_LESS_EQUAL: "LESS_EQUAL",
+  OPER_IN: "IN",
+  OPER_MATCHING: "MATCHING",
+  OPER_NOT_EQUAL: "NOT_EQUAL",
+  OPER_ISNULL: "IS_NULL",
+  OPER_STR: "STR",
 }
 type FieldType = keyof typeof Components;
 export type Field = ProColumns & {
@@ -41,6 +41,7 @@ export type Field = ProColumns & {
   requiredMark?: boolean,
   columns?: ProColumns[],
   queryParams?: ProColumns[],
+  returnKey?: string,
   dataSource?: {
     [key: string]: string | number
   }[]
@@ -134,7 +135,7 @@ const BaseForm: React.FC<Props> = (props) => {
                 value
               }
             })}
-            initialValue={'equal'}
+            initialValue={op.OPER_EQUAL}
             name={['values', index, 'op']}
           />
         )

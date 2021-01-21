@@ -21,6 +21,7 @@ export interface HovProps {
     dataIndex: string,
     key: string,
   }[],
+  returnKey: string,
   /**
    * 表格分页
    */
@@ -57,7 +58,7 @@ export interface HovProps {
   onChange?: (value: number | string) => void;
 }
 
-const Example: React.FC<HovProps> = ({ value, dataSource, columns , onChange, dispatch, namespace, itemKey, pager, queryParams }) => {
+const Example: React.FC<HovProps> = ({ value, dataSource, columns , onChange, dispatch, namespace, itemKey, pager, queryParams, returnKey }) => {
 
   const triggerChange = (changedValue: string | number) => {
     if (onChange) {
@@ -118,7 +119,8 @@ const Example: React.FC<HovProps> = ({ value, dataSource, columns , onChange, di
   const [form] = Form.useForm();
   const formRef = useRef<FormInstance>(form);
   const newDatas = _.reduce(queryParams, (result, item) => {
-    const key = item.key || '';
+    // @ts-ignore
+    const key = item[returnKey] || '';
     result[key] = (
       <Form.Item name={[key]} key={key}>
         <Input/>
@@ -126,14 +128,14 @@ const Example: React.FC<HovProps> = ({ value, dataSource, columns , onChange, di
     );
     return result
   }, {} as any)
-  newDatas.key ='key';
+  newDatas.key = returnKey;
 
   return (
     <>
       <Button type="default" onClick={showModal}>
         {value || '打开'}
       </Button>
-      <Modal title="参照查询" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} width={"60%"}>
+      <Modal title="参照查询" centered visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} width={"60%"}>
         <Form
           form={form}
           name="basic"
@@ -161,12 +163,12 @@ const Example: React.FC<HovProps> = ({ value, dataSource, columns , onChange, di
             handleSearchChange(pagination, filters, sorter)
           }}
           loading={loading}
-          rowKey="id"
+          rowKey={returnKey}
           onRow={record => {
             return {
               onClick: () => {
                 handleOk();
-                triggerChange(record.key);
+                triggerChange(record[returnKey]);
               }, // 点击行
             };
           }}

@@ -28,6 +28,7 @@ export type IHovs = Optional<{
   [key: string]: {
     columns: ProColumns[],
     queryParams: ProColumns[],
+    returnKey: string,
   }
 }>
 
@@ -67,6 +68,7 @@ export default class BaseService<T> {
   }
 
   async request(url: string, options: RequestOptionsInit) {
+    url = 'http://localhost' + url;
     const { status, msg, data, code }: Response = await this.req(url, options);
     if (!status) {
       throw new StandardError(msg, code);
@@ -75,27 +77,27 @@ export default class BaseService<T> {
   }
 
   async create(data: Optional<T>, method?: string) {
-    return await this.request(this.resource, {
+    return await this.request(`/${this.resource}`, {
       data,
       method: method || 'POST',
     })
   }
 
   async update(id: string | number, data?: Optional<T>, method?: string) {
-    return await this.request(`${this.resource}/${id}`, {
+    return await this.request(`/${this.resource}/${id}`, {
       data,
       method: method || 'PATCH',
     })
   }
 
   async delete(id: string | number, method?: string) {
-    return await this.request(`${this.resource}/${id}`, {
+    return await this.request(`/${this.resource}/${id}`, {
       method: method || 'DELETE',
     })
   }
 
   async get(id: string | number) {
-    return await this.request(`${this.resource}/${id}`, {
+    return await this.request(`/${this.resource}/${id}`, {
       method: 'GET',
     })   
   }
@@ -105,50 +107,55 @@ export default class BaseService<T> {
     hovs: IHovs,
     permissions: string[]
   }> {
-    const data = await this.request(`${this.resource}/module/init`, {
+    const data = await this.request(`/v1/module/init/${this.resource}`, {
       method: 'GET',
     })
-    const { dataitems, hovs = {}, permissions = []} = data; 
+    const { dataItems: dataitems, hovs = [], permissions = []} = data; 
     const dataitemsObj = _.reduce(dataitems, (result, item) => {
       // @ts-ignore
-      result[item.key] = item;
+      result[item.code] = item;
       return result
     }, {});
-    return { 
+    const val = { 
       dataitems: dataitemsObj, 
-      hovs: _.reduce(hovs, (result, item, hovKey) => {
-        const { columns, queryParams } = item
+      hovs: _.reduce(hovs, (result, item) => {
+        const { columns, queryParams, code, returnKey } = item
         // @ts-ignore
-        result[hovKey] = {
-          queryParams: queryParams.map((key: string) => {
+        result[code] = {
+          returnKey,
+          queryParams: queryParams.map((queryParamsItem: {key: string, dataIndex: string}) => {
+            const { key, dataIndex } = queryParamsItem;
              // @ts-ignore
-            const { name } = dataitemsObj[key] || { name: key, key };
+            const { name  } = dataitemsObj[dataIndex] || { name: dataIndex };
             return {
               title: name,
               key,
-              dataIndex: key,
+              dataIndex,
             }
           }),
-          columns: columns.map((key: string) => {
-             // @ts-ignore
-            const { name } = dataitemsObj[key] || { name: key, key };
-            return {
-              title: name,
-              key,
-              dataIndex: key,
-            }
+          columns: columns.map((columnsItem: {key: string, dataIndex: string}) => {
+            const { key, dataIndex } = columnsItem;
+            // @ts-ignore
+           const { name  } = dataitemsObj[dataIndex] || { name: dataIndex };
+           return {
+             title: name,
+             key,
+             dataIndex,
+           }
           })
         };
         return result
       }, {}), 
       permissions,
     }
+    console.log(val)
+    return val;
   }
 
-  async getHovData(hovKey: string, data?: any, current?: number, pageSize?: number): Promise<IHovDatas> {
-    const { list, pager } = await this.request(`${this.resource}/hov/query/${hovKey}`, {
+  async getHovData(hovKey: string, conditions?: any, current?: number, pageSize?: number): Promise<IHovDatas> {
+    const { list, pager } = await this.request(`/v1/hov/queryList/${hovKey}`, {
       data: {
-        data,
+        conditions: this.transformConditions(conditions),
         page: {
           current,
           pageSize
@@ -165,16 +172,28 @@ export default class BaseService<T> {
   }
 
   async list(data?: any, method?: string): Promise<T[]> {
-    return await this.request(`${this.resource}/data/list`, {
+    return await this.request(`/${this.resource}/data/list`, {
       data,
       method: method || 'POST',
     })
   }
 
-  async query(data?: any, current?: number, pageSize?: number, method?: string): Promise<IList<T>> {
-    return await this.request(`${this.resource}/query`, {
+  transformConditions(conditions?: any[]) {
+    return conditions?.map(item => {
+      const { op, key, value } = item;
+      return {
+        // filterDataType": "STRING1",
+        filterValue: value,
+        key,
+        oper: op
+      }
+    })
+  }
+
+  async query(conditions?: any, current?: number, pageSize?: number, method?: string): Promise<IList<T>> {
+    return await this.request(`/systemAdmin/api/${this.resource}/queryList`, {
       data: {
-        data,
+        conditions: this.transformConditions(conditions),
         page: {
           current,
           pageSize
