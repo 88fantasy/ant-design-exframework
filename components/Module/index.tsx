@@ -183,6 +183,7 @@ export default class Module<T, U extends ParamsType> extends React.Component<Mod
           title="高级查询框"
           visible={this.state.searchModal}
           forceRender={true}
+          centered
           onOk={() => {
             this.advancedSearchRef.current?.validateFields().then(() => {
               this.getList(this.advancedSearchRef.current?.getFieldsValue().values);
