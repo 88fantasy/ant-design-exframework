@@ -5,7 +5,7 @@ import { Modal, Button, message } from 'antd';
 import {
   DrawerForm,
 } from '@ant-design/pro-form';
-import BaseForm, { Field } from './BaseForm';
+import QueryParamModal, { QueryParamModalField } from '../QueryParamModal';
 import { FormInstance } from 'antd/lib/form';
 import { IDataItems, IHovs, Pager, IHovDatas } from './BaseService';
 import { TablePaginationConfig } from 'antd/lib/table';
@@ -35,9 +35,9 @@ export enum SearchType {
   STANDARD = 'standard'
 }
 export type ModuleAllProps<T, U extends ParamsType> = ModuleDataProps<T> & {
-  columns: Field[],
-  queryParams: Field[],
-  fields : Field[],
+  columns: QueryParamModalField[],
+  queryParams: QueryParamModalField[],
+  fields : QueryParamModalField[],
   opFormVisible?: boolean,
   proTableProps: ProTableProps<T, U>,
   type: SearchType,
@@ -200,7 +200,7 @@ export default class Module<T, U extends ParamsType> extends React.Component<Mod
           }}
           width={"60%"}
         >
-          <BaseForm formRef={this.advancedSearchRef} fields={this.props.queryParams} formStyle={"table"} dispatch={this.props.dispatch}/>
+          <QueryParamModal formRef={this.advancedSearchRef} fields={this.props.queryParams} formStyle={"table"} dispatch={this.props.dispatch}/>
         </Modal>
         <DrawerForm
           title="新建表单"

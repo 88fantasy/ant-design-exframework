@@ -1,10 +1,16 @@
 import { ProColumns } from '@ant-design/pro-table';
+import type { ParamsType } from '@ant-design/pro-provider';
 
 export declare type RuleProColumns = ProColumns & { rules?: any[] };
 
+export type QueryPageBaseRequest = {
+  sorter?: string;
+  page?: PaginationPage;
+};
+
 export declare type PaginationPage = {
-  current: number;
-  pageSize: number;
+  current?: number;
+  pageSize?: number;
 };
 
 export declare type PaginationPager = PaginationPage & {
@@ -27,4 +33,8 @@ export declare type ApiResponsePage<T> = {
     list: T[];
     pager: PaginationPager;
   };
+}
+
+export declare type RequestData<T extends ParamsType> = T & {
+  page?: PaginationPage;
 }

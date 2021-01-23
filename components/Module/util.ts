@@ -1,7 +1,7 @@
 import { pick, mergeWith } from 'lodash';
-import { Field } from './BaseForm';
+import type { QueryParamModalField } from '../QueryParamModal';
 
-export function pickBy(commonConfig: any, array: any): Field[] {
+export function pickBy(commonConfig: any, array: any): QueryParamModalField[] {
   let config = {};
   if (Array.isArray(commonConfig)) {
     commonConfig.forEach((item) => {

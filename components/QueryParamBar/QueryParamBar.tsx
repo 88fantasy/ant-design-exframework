@@ -4,9 +4,15 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import { SelectProps } from 'antd/es/select';
 
 export interface QueryParamType  {
+  /**
+   * 提交字段
+   */
   key: string;
-  name: string;
-  type: string;
+  /**
+   * 显示名称
+   */
+  title: string;
+  type: 'string' | 'dictionary';
 }
 
 
@@ -95,7 +101,7 @@ class QueryParamBar extends React.Component<QueryParamBarPropsType, QueryParamBa
             }}
           >
             <span>
-              {item.name}:{query}
+              {item.title}:{query}
             </span>
           </div>
         ),
@@ -125,7 +131,7 @@ class QueryParamBar extends React.Component<QueryParamBarPropsType, QueryParamBa
                   return <Tag key={`tag-${item.key}`} closable onClose={() => {
                     tags.splice(idx, 1);
                     this.setState({ ...this.state, tags });
-                  }}>{item.name}:{item.value}</Tag>
+                  }}>{item.title}:{item.value}</Tag>
                 })
               }
             </>

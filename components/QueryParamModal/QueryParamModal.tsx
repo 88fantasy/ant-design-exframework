@@ -1,12 +1,11 @@
-import React, { useRef, useState, Dispatch } from 'react';
-import { ProColumns } from '@ant-design/pro-table';
+import React, { useRef, useState } from 'react';
 import { Form, Table } from 'antd';
-import { FormInstance, Rule } from 'antd/lib/form';
+import { FormInstance,  } from 'antd/lib/form';
 import Checkbox from 'antd/lib/checkbox/Checkbox';
 import Components from './Components';
 import ProFormSelect from './Components/ProFormSelect';
-import './BaseForm.less';
-import { Pager } from './BaseService'
+import type { QueryParamModalField, QueryParamModalProps } from './index.d';
+import './style';
 
 const layout = {
   labelCol: {
@@ -29,34 +28,10 @@ const op = {
   OPER_ISNULL: "IS_NULL",
   OPER_STR: "STR",
 }
-type FieldType = keyof typeof Components;
-export type Field = ProColumns & {
-  type: FieldType,
-  name?: (string | number)[],
-  showTime?: boolean,
-  format?: string,
-  rules?: Rule[],
-  pager?: Pager,
-  namespace?: string,
-  requiredMark?: boolean,
-  columns?: ProColumns[],
-  queryParams?: ProColumns[],
-  returnKey?: string,
-  dataSource?: {
-    [key: string]: string | number
-  }[]
-}
-
-interface Props {
-  formStyle: 'table' | 'standard',
-  fields: Field[],
-  formRef?: React.MutableRefObject<FormInstance | undefined>,
-  dispatch: Dispatch<any>,
-
-}
 
 
-const BaseForm: React.FC<Props> = (props) => {
+
+const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
   const { fields, formRef: propsFormRef } = props;
   const [form] = Form.useForm();
   const formRef = useRef<FormInstance>(form);
@@ -75,7 +50,7 @@ const BaseForm: React.FC<Props> = (props) => {
   //     </Form.Item>
   //   )
   // }
-  const renderTableField = (item: Field, index: number, _record: any) => {
+  const renderTableField = (item: QueryParamModalField, index: number, _record: any) => {
     const { type, title, name, key, rules, ...rest } = item;
     const Component = Components[item.type] as any; 
     return (
@@ -187,4 +162,4 @@ const BaseForm: React.FC<Props> = (props) => {
     </div>
   );
 }
-export default BaseForm;
+export default QueryParamModal;
