@@ -1,7 +1,8 @@
-import { ProColumns } from '@ant-design/pro-table';
+import type { ProColumns } from '@ant-design/pro-table';
 import type { ParamsType } from '@ant-design/pro-provider';
+import type { Rule } from 'antd/lib/form';
 
-export declare type RuleProColumns = ProColumns & { rules?: any[] };
+export declare type RuleProColumns = ProColumns & { rules?: Rule[] };
 
 export type QueryPageBaseRequest = {
   sorter?: string;

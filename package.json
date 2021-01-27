@@ -1,6 +1,6 @@
 {
   "name": "ant-design-exframework",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "exframework for front ( base on antd )",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
