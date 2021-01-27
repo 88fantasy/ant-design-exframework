@@ -1,5 +1,5 @@
 import type { ProColumns } from '@ant-design/pro-table';
-import type { PaginationPager } from '../global/typing';
+import type { PaginationPager } from '../Typings';
 import Components from './Components';
 import type { Rule } from 'antd/lib/form';
 

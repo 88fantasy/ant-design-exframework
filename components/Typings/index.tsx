@@ -38,3 +38,7 @@ export declare type ApiResponsePage<T> = {
 export declare type RequestData<T extends ParamsType> = T & {
   page?: PaginationPage;
 }
+
+export type FilterCondition = {
+  key: string;
+}

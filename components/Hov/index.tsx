@@ -1,5 +1,5 @@
 import Hov from './Hov';
 
-export { HovProps,  } from './index.d';
+export { HovProps, HovParam, HovColumn, } from './Hov';
 
 export default Hov;
