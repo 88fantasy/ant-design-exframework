@@ -1,5 +1,6 @@
-import ProFormSelect from './ProFormSelect';
-import ProFormText from './ProFormText';
+import {
+  ProFormSelect, ProFormText,
+} from '@ant-design/pro-form';
 import Hov from '../../Hov'
 import {
   ProFormDateTimePicker,

@@ -1,7 +1,7 @@
 import React, { Dispatch } from 'react';
 import { ParamsType } from '@ant-design/pro-provider';
 import ProTable, {  ProTableProps } from '@ant-design/pro-table';
-import { Modal, Button, message } from 'antd';
+import { Button, message } from 'antd';
 import {
   DrawerForm,
 } from '@ant-design/pro-form';
@@ -168,40 +168,25 @@ export default class Module<T, U extends ParamsType> extends React.Component<Mod
   }
 
   render() {  
-    const { proTableProps: { editable, rowKey, pagination }, columns, queryParams } = this.props;
-    const newCols = queryParams.map(item => {
-      item.hideInTable = true;
-      return item
-    }).concat(columns.map(item => {
-      item.search = false
-      return item
-    }));
+    const { proTableProps: { editable, rowKey, pagination }, } = this.props;
+    // const newCols = queryParams.map(item => {
+    //   item.hideInTable = true;
+    //   return item
+    // }).concat(columns.map(item => {
+    //   item.search = false
+    //   return item
+    // }));
    
     return (
       <div>
-        <Modal
-          title="高级查询框"
-          visible={this.state.searchModal}
-          forceRender={true}
-          centered
-          onOk={() => {
-            this.advancedSearchRef.current?.validateFields().then(() => {
-              this.getList(this.advancedSearchRef.current?.getFieldsValue().values);
-              this.setState({
-                searchModal: false
-              })
-            });
-            
+        <QueryParamModal 
+          formRef={this.advancedSearchRef} 
+          fields={this.props.queryParams} 
+          formStyle="table" 
+          onFinish={() => {
+
           }}
-          onCancel={() => {
-            this.setState({
-              searchModal: false
-            })
-          }}
-          width={"60%"}
-        >
-          <QueryParamModal formRef={this.advancedSearchRef} fields={this.props.queryParams} formStyle={"table"} dispatch={this.props.dispatch}/>
-        </Modal>
+        />
         <DrawerForm
           title="新建表单"
           visible={this.props.opFormVisible}
@@ -215,7 +200,7 @@ export default class Module<T, U extends ParamsType> extends React.Component<Mod
           
         </DrawerForm>
         <ProTable<T>
-          columns={newCols}
+          columns={[]}
           request={
             async () => {
               await this.search();

@@ -1,5 +1,12 @@
 import QueryParamModal from './QueryParamModal';
 
-export { QueryParamModalProps, QueryParamModalField } from './index.d';
+export { 
+  QueryParamModalProps, 
+  QueryParamModalField, 
+  FilterConditionDataType, 
+  FilterCondition, 
+  QueryParamModalFieldType,
+  FilterConditionOperType,
+ } from './QueryParamModal';
 
 export default QueryParamModal;

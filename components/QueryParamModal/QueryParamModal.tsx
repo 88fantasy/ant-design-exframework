@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
-import { Form, Table } from 'antd';
-import { FormInstance,  } from 'antd/lib/form';
-import Checkbox from 'antd/lib/checkbox/Checkbox';
+import { Form, Table, Modal, Button, Checkbox, Typography, message } from 'antd';
+import type { TableColumnType } from 'antd';
+import type { FormInstance, Rule } from 'antd/lib/form';
 import Components from './Components';
-import ProFormSelect from './Components/ProFormSelect';
-import type { QueryParamModalField, QueryParamModalProps } from './index.d';
+import {
+  ProFormSelect, ProFormText,
+} from '@ant-design/pro-form';
 import './style';
 
 const layout = {
@@ -15,30 +16,237 @@ const layout = {
     span: 16,
   },
 };
-const op = {
-  OPER_EQUAL: "EQUAL",
-  OPER_GREATER: "GREATER",
-  OPER_LESS: "LESS",
-  OPER_BETWEEN: "BETWEEN",
-  OPER_GREATER_EQUAL: "GREATER_EQUAL",
-  OPER_LESS_EQUAL: "LESS_EQUAL",
-  OPER_IN: "IN",
-  OPER_MATCHING: "MATCHING",
-  OPER_NOT_EQUAL: "NOT_EQUAL",
-  OPER_ISNULL: "IS_NULL",
-  OPER_STR: "STR",
+
+
+
+enum FilterConditionOper {
+  /**
+   * 等于
+   */
+  EQUAL = "EQUAL",
+  /**
+   * 大于
+   */
+  GREATER = "GREATER",
+  /**
+   * 小于
+   */
+  LESS = "LESS",
+  /**
+   * 介于
+   */
+  BETWEEN = "BETWEEN",
+  /**
+   * 大于等于
+   */
+  GREATER_EQUAL = "GREATER_EQUAL",
+  /**
+   * 小于等于
+   */
+  LESS_EQUAL = "LESS_EQUAL",
+  /**
+   * 包含
+   */
+  IN = "IN",
+  /**
+   * 匹配
+   */
+  MATCHING = "MATCHING",
+  /**
+   * 不等于
+   */
+  NOT_EQUAL = "NOT_EQUAL",
+  /**
+   * 为空
+   */
+  ISNULL = "IS_NULL",
+  /**
+   * 不为空
+   */
+  IS_NOT_NULL = "IS_NOT_NULL",
+  /**
+   * 自定义
+   */
+  STR = "STR",
+}
+
+export type FilterConditionOperType = keyof typeof FilterConditionOper;
+
+enum FilterConditionDataTypeEnum {
+  /**
+   * 字符串
+   */
+  STRING = "STRING",
+  /**
+   * 数组
+   */
+  LIST = "LIST",
+  /**
+   * 数字
+   */
+  NUMBER = "NUMBER",
+  /**
+   * 布尔
+   */
+  BOOLEAN = "BOOLEAN",
+  /**
+   * JSON
+   */
+  JSON = "JSON",
+  /**
+   * 日期
+   */
+  DATE = "DATE",
+  /**
+   * 日期时间
+   */
+  DATETIME = "DATETIME",
+}
+
+export type FilterConditionDataType = keyof typeof FilterConditionDataTypeEnum;
+
+export type FilterCondition = {
+  key: string;
+  oper: FilterConditionOperType;
+  filterValue: any;
+  filterDataType: FilterConditionDataType;
 }
 
 
+export type QueryParamModalFieldType = keyof typeof Components;
+
+export type QueryParamModalField = {
+  key: string;
+  title: string;
+  type: QueryParamModalFieldType;
+  name?: (string | number)[];
+  rules?: Rule[];
+
+  opers?: FilterConditionOperType[];
+  /**
+   * 初始操作符
+   */
+  initialOperValue?: FilterConditionOperType;
+  /**
+   * 编辑器属性, 参考各编辑器文档
+   */
+  fieldProps?: any;
+}
+
+type FilerConditionRowValue = {
+  checkbox: boolean;
+  key: string;
+  oper: FilterConditionOperType;
+  value: any;
+  dataType: FilterConditionDataType;
+}
+
+export type FilerConditionRow = {
+  checkbox: boolean;
+  key: string;
+  label: string;
+  oper?: FilterConditionOper;
+  field: QueryParamModalField;
+}
+
+
+export type QueryParamModalProps = {
+  title?: string;
+  formStyle?: 'table' | 'standard';
+  fields: QueryParamModalField[];
+  formRef?: React.MutableRefObject<FormInstance | undefined>;
+  onFinish: (conditions: FilterCondition[]) => void;
+}
+
+const getOperLabel = (oper: FilterConditionOper) => {
+  switch (oper) {
+    case FilterConditionOper.EQUAL:
+      return '=';
+    case FilterConditionOper.NOT_EQUAL:
+      return '!=';
+    case FilterConditionOper.GREATER:
+      return '>';
+    case FilterConditionOper.GREATER_EQUAL:
+      return '>=';
+    case FilterConditionOper.LESS:
+      return '<';
+    case FilterConditionOper.LESS_EQUAL:
+      return '<=';
+    case FilterConditionOper.BETWEEN:
+      return '介于';
+    case FilterConditionOper.IN:
+      return '包含';
+    case FilterConditionOper.ISNULL:
+      return '为空';
+    case FilterConditionOper.IS_NOT_NULL:
+      return '不为空';
+    case FilterConditionOper.MATCHING:
+      return '匹配';
+    case FilterConditionOper.STR:
+      return '自定义';
+    default:
+      return '未定义';
+  }
+}
+
+const getDefaultFieldDataType = (type: QueryParamModalFieldType): FilterConditionDataType => {
+  switch (type) {
+    case 'RangePicker':
+    case 'ProFormSelect':
+      return FilterConditionDataTypeEnum.LIST;
+    case 'ProFormDateTimePicker':
+      return FilterConditionDataTypeEnum.DATETIME;
+    case 'DatePicker':
+      return FilterConditionDataTypeEnum.DATE;
+    case 'ProFormText':
+    case 'Hov':
+      return FilterConditionDataTypeEnum.STRING;
+  }
+}
+
+const getDefaultOpers = (field: QueryParamModalField): string[] => {
+  if (field.opers) {
+    return field.opers;
+  }
+  else {
+    switch (field.type) {
+      case 'RangePicker':
+      case 'ProFormSelect':
+        return [FilterConditionOper.IN, FilterConditionOper.ISNULL];
+      case 'ProFormDateTimePicker':
+      case 'DatePicker':
+        return [FilterConditionOper.BETWEEN, FilterConditionOper.GREATER, FilterConditionOper.LESS, FilterConditionOper.GREATER_EQUAL, FilterConditionOper.LESS_EQUAL, FilterConditionOper.ISNULL];
+      case 'ProFormText':
+        return [FilterConditionOper.MATCHING, FilterConditionOper.EQUAL, FilterConditionOper.ISNULL, FilterConditionOper.IS_NOT_NULL];
+      case 'Hov':
+        return [FilterConditionOper.EQUAL, FilterConditionOper.NOT_EQUAL];
+    }
+  }
+}
 
 const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
-  const { fields, formRef: propsFormRef } = props;
+  const {
+    title = '高级查询',
+    fields,
+    formRef: propsFormRef,
+    onFinish,
+    // formStyle = 'table',
+  } = props;
   const [form] = Form.useForm();
   const formRef = useRef<FormInstance>(form);
   const [, updateState] = useState(false);
+  const [visible, setVisible] = useState(false);
   const forgetUpdate = () => {
     setTimeout(() => updateState(true));
   };
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
+
 
 
   // const renderField = (item: Field) => {
@@ -51,24 +259,22 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
   //   )
   // }
   const renderTableField = (item: QueryParamModalField, index: number, _record: any) => {
-    const { type, title, name, key, rules, ...rest } = item;
-    const Component = Components[item.type] as any; 
+    const { key, rules, fieldProps, } = item;
+    const Component = Components[item.type] as any;
     return (
       <Form.Item name={['values', index, 'value']} rules={rules} >
-        <Component {...rest} name={['values', index, 'value']} itemKey={key} dispatch={props.dispatch}/>
+        <Component {...fieldProps} name={['values', index, 'value']} itemKey={key} />
       </Form.Item>
     )
   }
-  const columns = [
+  const columns: TableColumnType<FilerConditionRow>[] = [
     {
-      title: '复选框',
       dataIndex: 'checkbox',
-      key: 'checkbox',
-      width: 100,
-      render: (_text: string, _record: any, index: number) => {
+      width: 40,
+      render: (_text: string, _record: FilerConditionRow, index: number) => {
         return (
           <Form.Item name={['values', index, 'checkbox']} valuePropName="checked" initialValue={false}>
-            <Checkbox/>
+            <Checkbox />
           </Form.Item>
         )
       }
@@ -76,42 +282,46 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
     {
       title: '字段',
       dataIndex: 'key',
-      key: 'key',
-      width: 200,
-      render: (_text: string, record: any, index: number) => {
+      width: 150,
+      render: (_text: string, record: FilerConditionRow, index: number) => {
         return (
-          <ProFormSelect
-            options={[
-              {
-                value: record.key,
-                label: record.label
-              },
-            ]}
-            disabled
-            initialValue={record.key}
-            name={['values', index, 'key']}
-          />
+          <div style={{ display: 'flex' }}>
+            <Form.Item style={{ width: 150 }}>
+              <Typography.Text>{record.label}</Typography.Text>
+            </Form.Item>
+            <ProFormText
+              disabled
+              initialValue={record.key}
+              fieldProps={{ style: { display: 'none' } }}
+              name={['values', index, 'key']}
+            />
+            <ProFormText
+              name={['values', index, 'dataType']}
+              disabled
+              fieldProps={{ style: { display: 'none' } }}
+              initialValue={getDefaultFieldDataType(record.field.type)} />
+          </div>
+
         )
       }
     },
     {
       title: '操作符',
-      dataIndex: 'op',
-      key: 'op',
-      width: 200,
-      render: (_text: string, _record: any, index: number) => {
+      dataIndex: 'oper',
+      width: 150,
+      render: (_text: string, _record: FilerConditionRow, index: number) => {
+        const opers = getDefaultOpers(_record.field);
         return (
           <ProFormSelect
-            options={Object.keys(op).map(key => {
-              // @ts-ignore
-              const value = op[key]
+            options={opers.map(key => {
+              const oper = key as FilterConditionOper;
               return {
-                label: value,
-                value
+                label: getOperLabel(oper),
+                value: key,
               }
             })}
-            initialValue={op.OPER_EQUAL}
-            name={['values', index, 'op']}
+            initialValue={_record.oper || (opers && opers[0])}
+            name={['values', index, 'oper']}
           />
         )
       }
@@ -119,47 +329,78 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
     {
       title: '值',
       dataIndex: 'field',
-      key: 'field',
-      render: (_text: string, record: any, index: number) => {
+      render: (_text: string, record: FilerConditionRow, index: number) => {
         return renderTableField(record.field, index, record);
       }
     },
   ]
-  const datas = fields.map(field => {
+  const datas: FilerConditionRow[] = fields.map(field => {
     return {
       checkbox: false,
       key: field.key,
       label: field.title,
-      op: '=',
-      field
+      oper: field.initialOperValue as FilterConditionOper,
+      field,
     }
   })
   return (
-    <div className="base-form">
-      <Form
-        form={form}
-        {...layout}
-        name="basic"
-        initialValues={{}}
+    <>
+      <Button type="default" onClick={showModal}>
+        {title}
+      </Button>
+      <Modal
+        title={title}
+        visible={visible}
+        forceRender={true}
+        centered
+        onOk={async () => {
+          const conditions: FilterCondition[] = [];
+          await form.validateFields().then(({ values }: { values: FilerConditionRowValue[] }) => {
+            values.filter(item => item.checkbox).forEach(item => {
+              conditions.push({
+                key: item.key,
+                oper: item.oper,
+                filterValue: item.value,
+                filterDataType: item.dataType,
+              });
+            });
+          }).catch((errorInfo) => {
+            message.error(`条件校验失败: ${errorInfo}`);
+          });
+          setVisible(false);
+          onFinish(conditions);
+        }}
+        onCancel={handleCancel}
+        width={"60%"}
+        okText="查询"
       >
-        <input
-          type="text"
-          style={{
-            display: 'none',
-          }}
-        />
-        <Form.Item noStyle shouldUpdate>
-          {(formInstance) => {
-            // 支持 fromRef，这里 ref 里面可以随时拿到最新的值
-            if (propsFormRef && !propsFormRef.current) forgetUpdate();
-            if (propsFormRef) propsFormRef.current = formInstance as FormInstance;
-            formRef.current = formInstance as FormInstance;
-          }}
-        </Form.Item>
-        
-        <Table columns={columns} dataSource={datas} pagination={false}/>
-      </Form>
-    </div>
+        <div className="base-form">
+          <Form
+            form={form}
+            {...layout}
+            name="basic"
+            initialValues={{}}
+          >
+            <input
+              type="text"
+              style={{
+                display: 'none',
+              }}
+            />
+            <Form.Item noStyle shouldUpdate>
+              {(formInstance) => {
+                // 支持 fromRef，这里 ref 里面可以随时拿到最新的值
+                if (propsFormRef && !propsFormRef.current) forgetUpdate();
+                if (propsFormRef) propsFormRef.current = formInstance as FormInstance;
+                formRef.current = formInstance as FormInstance;
+              }}
+            </Form.Item>
+
+            <Table columns={columns} dataSource={datas} pagination={false} />
+          </Form>
+        </div>
+      </Modal>
+    </>
   );
 }
 export default QueryParamModal;
