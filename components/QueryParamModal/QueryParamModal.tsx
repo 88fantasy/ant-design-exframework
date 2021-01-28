@@ -105,23 +105,55 @@ enum FilterConditionDataTypeEnum {
 
 export type FilterConditionDataType = keyof typeof FilterConditionDataTypeEnum;
 
+/**
+ * 查询条件
+ */
 export type FilterCondition = {
+  /**
+   * 提交字段
+   */
   key: string;
+  /**
+   * 操作符
+   */
   oper: FilterConditionOperType;
+  /**
+   * 值
+   */
   filterValue: any;
+  /**
+   * 数据类型
+   */
   filterDataType: FilterConditionDataType;
 }
 
 
 export type QueryParamModalFieldType = keyof typeof Components;
 
+/**
+ * 查询字段属性
+ */
 export type QueryParamModalField = {
+  /**
+   * 提交字段
+   */
   key: string;
+  /**
+   * 显示
+   */
   title: string;
+  /**
+   * 编辑器类型
+   */
   type: QueryParamModalFieldType;
-  name?: (string | number)[];
+  
+  /**
+   * 校验规则
+   */
   rules?: Rule[];
-
+  /**
+   * 可选操作符
+   */
   opers?: FilterConditionOperType[];
   /**
    * 初始操作符
@@ -134,27 +166,75 @@ export type QueryParamModalField = {
 }
 
 type FilerConditionRowValue = {
+  /**
+   * 是否勾选
+   */
   checkbox: boolean;
+  /**
+   * 提交字段
+   */
   key: string;
+  /**
+   * 操作符
+   */
   oper: FilterConditionOperType;
+  /**
+   * 操作值, 根据不同编辑器会不同
+   */
   value: any;
+  /**
+   * 值类型
+   */
   dataType: FilterConditionDataType;
 }
 
 export type FilerConditionRow = {
+  /**
+   * 是否选择
+   */
   checkbox: boolean;
+  /**
+   * 提交字段
+   */
   key: string;
+  /**
+   * 显示名称
+   */
   label: string;
+  /**
+   * 操作符
+   * @default 可选操作数组第一个
+   */
   oper?: FilterConditionOper;
+  /**
+   * 字段设置
+   */
   field: QueryParamModalField;
 }
 
 
 export type QueryParamModalProps = {
+  /**
+   * 查询框标题
+   * @default 高级查询
+   */
   title?: string;
+  /**
+   * 显示类型
+   * @default table
+   */
   formStyle?: 'table' | 'standard';
+  /**
+   * 查询框字段信息
+   */
   fields: QueryParamModalField[];
+  /**
+   * 查询框 Form 的引用
+   */
   formRef?: React.MutableRefObject<FormInstance | undefined>;
+  /**
+   * 点击查询的时候回调函数
+   */
   onFinish: (conditions: FilterCondition[]) => void;
 }
 
@@ -193,6 +273,8 @@ const getDefaultFieldDataType = (type: QueryParamModalFieldType): FilterConditio
   switch (type) {
     case 'RangePicker':
     case 'ProFormSelect':
+    case 'ProFormDateRangePicker':
+    case 'ProFormDateTimeRangePicker':
       return FilterConditionDataTypeEnum.LIST;
     case 'ProFormDateTimePicker':
       return FilterConditionDataTypeEnum.DATETIME;
@@ -216,6 +298,8 @@ const getDefaultOpers = (field: QueryParamModalField): string[] => {
       case 'ProFormDateTimePicker':
       case 'DatePicker':
         return [FilterConditionOper.BETWEEN, FilterConditionOper.GREATER, FilterConditionOper.LESS, FilterConditionOper.GREATER_EQUAL, FilterConditionOper.LESS_EQUAL, FilterConditionOper.ISNULL];
+      case 'ProFormDateRangePicker':
+      case 'ProFormDateTimeRangePicker':
       case 'ProFormText':
         return [FilterConditionOper.MATCHING, FilterConditionOper.EQUAL, FilterConditionOper.ISNULL, FilterConditionOper.IS_NOT_NULL];
       case 'Hov':

@@ -15,19 +15,26 @@ export type HovParam =  QueryParamType & {
 }
 
 export type HovProps<T, U extends ParamsType> = {
+  /**
+   * 标题
+   */
   title?: string;
   /**
-   * 值
+   * 选定值
    */
   value?: number | string,
   /**
    * 表头列定义
    */
   columns: HovColumn[],
+  /**
+   * 返回字段
+   */
   returnKey: string,  
   /**
    *
    * 用于定义 payload的 hovkey
+   * @default 与returnKey 相同
    */
   itemKey?: string,
   /**
@@ -39,6 +46,9 @@ export type HovProps<T, U extends ParamsType> = {
    */
   onFinish?: (value: any, record: T) => void;
 
+  /**
+   * 返回数据的请求
+   */
   request?: (
     params: RequestData<U>,
     sort: Record<string, SortOrder>,
