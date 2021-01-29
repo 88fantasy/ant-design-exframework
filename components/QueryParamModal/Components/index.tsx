@@ -1,17 +1,12 @@
 import {
-  ProFormSelect, ProFormText,
+  ProFormSelect, ProFormText, ProFormDatePicker, ProFormDateTimeRangePicker, ProFormDigit,
 } from '@ant-design/pro-form';
-import Hov from '../../Hov'
-import {
-  ProFormDateTimePicker,
-} from '@ant-design/pro-form';
-import { DatePicker } from 'antd';
-const { RangePicker } = DatePicker
+import Hov from '../../Hov';
 export default {
   ProFormSelect,
   ProFormText,
-  DatePicker,
-  RangePicker,
-  ProFormDateTimePicker,
+  ProFormDatePicker,
+  ProFormDateTimeRangePicker,
+  ProFormDigit,
   Hov,
 }

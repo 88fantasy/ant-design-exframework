@@ -1,73 +1,64 @@
 import React, { useRef, useState } from 'react';
-import { Form, Table, Modal, Button, Checkbox, Typography, message } from 'antd';
-import type { TableColumnType } from 'antd';
+import { Form, Table, Modal, Button, Checkbox, Typography, message, TableColumnType } from 'antd';
+// import  Protable, { ProColumnType} from '@ant-design/pro-table';
 import type { FormInstance, Rule } from 'antd/lib/form';
 import Components from './Components';
-import {
-  ProFormSelect, ProFormText,
-} from '@ant-design/pro-form';
+import { ProFormSelect, ProFormText } from '@ant-design/pro-form';
+import { Moment } from 'moment';
+import { defaultMomentDateTime } from '../Typings';
+
 import './style';
-
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-};
-
 
 
 enum FilterConditionOper {
   /**
    * 等于
    */
-  EQUAL = "EQUAL",
+  EQUAL = 'EQUAL',
   /**
    * 大于
    */
-  GREATER = "GREATER",
+  GREATER = 'GREATER',
   /**
    * 小于
    */
-  LESS = "LESS",
+  LESS = 'LESS',
   /**
    * 介于
    */
-  BETWEEN = "BETWEEN",
+  BETWEEN = 'BETWEEN',
   /**
    * 大于等于
    */
-  GREATER_EQUAL = "GREATER_EQUAL",
+  GREATER_EQUAL = 'GREATER_EQUAL',
   /**
    * 小于等于
    */
-  LESS_EQUAL = "LESS_EQUAL",
+  LESS_EQUAL = 'LESS_EQUAL',
   /**
    * 包含
    */
-  IN = "IN",
+  IN = 'IN',
   /**
    * 匹配
    */
-  MATCHING = "MATCHING",
+  MATCHING = 'MATCHING',
   /**
    * 不等于
    */
-  NOT_EQUAL = "NOT_EQUAL",
+  NOT_EQUAL = 'NOT_EQUAL',
   /**
    * 为空
    */
-  ISNULL = "IS_NULL",
+  ISNULL = 'IS_NULL',
   /**
    * 不为空
    */
-  IS_NOT_NULL = "IS_NOT_NULL",
+  IS_NOT_NULL = 'IS_NOT_NULL',
   /**
    * 自定义
    */
-  STR = "STR",
+  STR = 'STR',
 }
 
 export type FilterConditionOperType = keyof typeof FilterConditionOper;
@@ -76,31 +67,31 @@ enum FilterConditionDataTypeEnum {
   /**
    * 字符串
    */
-  STRING = "STRING",
+  STRING = 'STRING',
   /**
    * 数组
    */
-  LIST = "LIST",
+  LIST = 'LIST',
   /**
    * 数字
    */
-  NUMBER = "NUMBER",
+  NUMBER = 'NUMBER',
   /**
    * 布尔
    */
-  BOOLEAN = "BOOLEAN",
+  BOOLEAN = 'BOOLEAN',
   /**
    * JSON
    */
-  JSON = "JSON",
+  JSON = 'JSON',
   /**
    * 日期
    */
-  DATE = "DATE",
+  DATE = 'DATE',
   /**
    * 日期时间
    */
-  DATETIME = "DATETIME",
+  DATETIME = 'DATETIME',
 }
 
 export type FilterConditionDataType = keyof typeof FilterConditionDataTypeEnum;
@@ -125,8 +116,7 @@ export type FilterCondition = {
    * 数据类型
    */
   filterDataType: FilterConditionDataType;
-}
-
+};
 
 export type QueryParamModalFieldType = keyof typeof Components;
 
@@ -146,7 +136,7 @@ export type QueryParamModalField = {
    * 编辑器类型
    */
   type: QueryParamModalFieldType;
-  
+
   /**
    * 校验规则
    */
@@ -163,7 +153,7 @@ export type QueryParamModalField = {
    * 编辑器属性, 参考各编辑器文档
    */
   fieldProps?: any;
-}
+};
 
 type FilerConditionRowValue = {
   /**
@@ -183,10 +173,10 @@ type FilerConditionRowValue = {
    */
   value: any;
   /**
-   * 值类型
+   * 编辑器类型
    */
-  dataType: FilterConditionDataType;
-}
+  editor: string;
+};
 
 export type FilerConditionRow = {
   /**
@@ -210,8 +200,7 @@ export type FilerConditionRow = {
    * 字段设置
    */
   field: QueryParamModalField;
-}
-
+};
 
 export type QueryParamModalProps = {
   /**
@@ -236,7 +225,7 @@ export type QueryParamModalProps = {
    * 点击查询的时候回调函数
    */
   onFinish: (conditions: FilterCondition[]) => void;
-}
+};
 
 const getOperLabel = (oper: FilterConditionOper) => {
   switch (oper) {
@@ -267,46 +256,53 @@ const getOperLabel = (oper: FilterConditionOper) => {
     default:
       return '未定义';
   }
-}
+};
 
 const getDefaultFieldDataType = (type: QueryParamModalFieldType): FilterConditionDataType => {
   switch (type) {
-    case 'RangePicker':
     case 'ProFormSelect':
-    case 'ProFormDateRangePicker':
     case 'ProFormDateTimeRangePicker':
       return FilterConditionDataTypeEnum.LIST;
-    case 'ProFormDateTimePicker':
-      return FilterConditionDataTypeEnum.DATETIME;
-    case 'DatePicker':
+    case 'ProFormDatePicker':
       return FilterConditionDataTypeEnum.DATE;
+    case 'ProFormDigit':
+      return FilterConditionDataTypeEnum.NUMBER;
     case 'ProFormText':
     case 'Hov':
       return FilterConditionDataTypeEnum.STRING;
   }
-}
+};
 
 const getDefaultOpers = (field: QueryParamModalField): string[] => {
   if (field.opers) {
     return field.opers;
-  }
-  else {
+  } else {
     switch (field.type) {
-      case 'RangePicker':
       case 'ProFormSelect':
         return [FilterConditionOper.IN, FilterConditionOper.ISNULL];
-      case 'ProFormDateTimePicker':
-      case 'DatePicker':
-        return [FilterConditionOper.BETWEEN, FilterConditionOper.GREATER, FilterConditionOper.LESS, FilterConditionOper.GREATER_EQUAL, FilterConditionOper.LESS_EQUAL, FilterConditionOper.ISNULL];
-      case 'ProFormDateRangePicker':
+      case 'ProFormDigit':
+      case 'ProFormDatePicker':
+        return [
+          FilterConditionOper.GREATER,
+          FilterConditionOper.LESS,
+          FilterConditionOper.GREATER_EQUAL,
+          FilterConditionOper.LESS_EQUAL,
+          FilterConditionOper.ISNULL,
+        ];
       case 'ProFormDateTimeRangePicker':
+        return [FilterConditionOper.BETWEEN, ];
       case 'ProFormText':
-        return [FilterConditionOper.MATCHING, FilterConditionOper.EQUAL, FilterConditionOper.ISNULL, FilterConditionOper.IS_NOT_NULL];
+        return [
+          FilterConditionOper.MATCHING,
+          FilterConditionOper.EQUAL,
+          FilterConditionOper.ISNULL,
+          FilterConditionOper.IS_NOT_NULL,
+        ];
       case 'Hov':
         return [FilterConditionOper.EQUAL, FilterConditionOper.NOT_EQUAL];
     }
   }
-}
+};
 
 const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
   const {
@@ -331,26 +327,15 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
     setVisible(false);
   };
 
-
-
-  // const renderField = (item: Field) => {
-  //   const { type, title, name, key, ...rest } = item;
-  //   const Component = Components[item.type] as any;
-  //   return (
-  //     <Form.Item label={title} name={name || [key || ""]}>
-  //       <Component {...rest} name={name || [key || ""]}/>
-  //     </Form.Item>
-  //   )
-  // }
   const renderTableField = (item: QueryParamModalField, index: number, _record: any) => {
-    const { key, rules, fieldProps, } = item;
+    const { key, rules, fieldProps } = item;
     const Component = Components[item.type] as any;
     return (
-      <Form.Item name={['values', index, 'value']} rules={rules} >
+      <Form.Item name={['values', index, 'value']} rules={rules}>
         <Component {...fieldProps} name={['values', index, 'value']} itemKey={key} />
       </Form.Item>
-    )
-  }
+    );
+  };
   const columns: TableColumnType<FilerConditionRow>[] = [
     {
       dataIndex: 'checkbox',
@@ -360,13 +345,13 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
           <Form.Item name={['values', index, 'checkbox']} valuePropName="checked" initialValue={false}>
             <Checkbox />
           </Form.Item>
-        )
-      }
+        );
+      },
     },
     {
       title: '字段',
       dataIndex: 'key',
-      width: 150,
+      width: 100,
       render: (_text: string, record: FilerConditionRow, index: number) => {
         return (
           <div style={{ display: 'flex' }}>
@@ -380,53 +365,53 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
               name={['values', index, 'key']}
             />
             <ProFormText
-              name={['values', index, 'dataType']}
+              name={['values', index, 'editor']}
               disabled
               fieldProps={{ style: { display: 'none' } }}
-              initialValue={getDefaultFieldDataType(record.field.type)} />
+              initialValue={record.field.type}
+            />
           </div>
-
-        )
-      }
+        );
+      },
     },
     {
       title: '操作符',
       dataIndex: 'oper',
-      width: 150,
+      width: 120,
       render: (_text: string, _record: FilerConditionRow, index: number) => {
         const opers = getDefaultOpers(_record.field);
         return (
           <ProFormSelect
-            options={opers.map(key => {
+            options={opers.map((key) => {
               const oper = key as FilterConditionOper;
               return {
                 label: getOperLabel(oper),
                 value: key,
-              }
+              };
             })}
             initialValue={_record.oper || (opers && opers[0])}
             name={['values', index, 'oper']}
           />
-        )
-      }
+        );
+      },
     },
     {
       title: '值',
       dataIndex: 'field',
       render: (_text: string, record: FilerConditionRow, index: number) => {
         return renderTableField(record.field, index, record);
-      }
+      },
     },
-  ]
-  const datas: FilerConditionRow[] = fields.map(field => {
+  ];
+  const datas: FilerConditionRow[] = fields.map((field) => {
     return {
       checkbox: false,
       key: field.key,
       label: field.title,
       oper: field.initialOperValue as FilterConditionOper,
       field,
-    }
-  })
+    };
+  });
   return (
     <>
       <Button type="default" onClick={showModal}>
@@ -437,34 +422,42 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
         visible={visible}
         forceRender={true}
         centered
+        bodyStyle={{padding : 0}}
         onOk={async () => {
           const conditions: FilterCondition[] = [];
-          await form.validateFields().then(({ values }: { values: FilerConditionRowValue[] }) => {
-            values.filter(item => item.checkbox).forEach(item => {
-              conditions.push({
-                key: item.key,
-                oper: item.oper,
-                filterValue: item.value,
-                filterDataType: item.dataType,
-              });
+          await form
+            .validateFields()
+            .then(({ values }: { values: FilerConditionRowValue[] }) => {
+              values
+                .filter((item) => item.checkbox)
+                .forEach((item) => {
+                  const type = item.editor as QueryParamModalFieldType;
+                  switch(type) {
+                    case 'ProFormDateTimeRangePicker':
+                      item.value = [(item.value[0] as Moment).format(defaultMomentDateTime)  , (item.value[1] as Moment).format(defaultMomentDateTime)];
+                      break;
+                    default:
+                  }
+                  conditions.push({
+                    key: item.key,
+                    oper: item.oper,
+                    filterValue: item.value,
+                    filterDataType: getDefaultFieldDataType(type),
+                  });
+                });
+            })
+            .catch((errorInfo) => {
+              message.error(`条件校验失败: ${errorInfo}`);
             });
-          }).catch((errorInfo) => {
-            message.error(`条件校验失败: ${errorInfo}`);
-          });
           setVisible(false);
           onFinish(conditions);
         }}
         onCancel={handleCancel}
-        width={"60%"}
+        width={'60%'}
         okText="查询"
       >
         <div className="base-form">
-          <Form
-            form={form}
-            {...layout}
-            name="basic"
-            initialValues={{}}
-          >
+          <Form form={form} name="basic" initialValues={{}}>
             <input
               type="text"
               style={{
@@ -479,12 +472,11 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
                 formRef.current = formInstance as FormInstance;
               }}
             </Form.Item>
-
             <Table columns={columns} dataSource={datas} pagination={false} />
           </Form>
         </div>
       </Modal>
     </>
   );
-}
+};
 export default QueryParamModal;
