@@ -4,7 +4,7 @@ import type { ParamsType } from '@ant-design/pro-provider';
 import type { SorterResult, SortOrder, } from 'antd/es/table/interface';
 import QueryParamBar, { QueryParamType } from '../QueryParamBar';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import type { ApiResponsePage, RequestData } from '../Typings';
+import type { ApiResponsePage, RequestParamsType } from '../Typings';
 
 export type HovColumn = ProColumns & {
   
@@ -50,7 +50,7 @@ export type HovProps<T, U extends ParamsType> = {
    * 返回数据的请求
    */
   request?: (
-    params: RequestData<U>,
+    params: RequestParamsType<U>,
     sort: Record<string, SortOrder>,
     filter: Record<string, React.ReactText[]>,
   ) => Promise<Partial<ApiResponsePage<T>>>;
@@ -73,7 +73,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
   const [visible, setVisible] = useState(false);
   const actionRef = useRef<ActionType>();
   const [sorter, setSorter] = useState<string>('');
-  const [searchParams, setSearchParams] = useState<RequestData<U>>();
+  const [searchParams, setSearchParams] = useState<RequestParamsType<U>>();
   
   const showDrawer = () => {
     setVisible(true);
@@ -106,7 +106,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
               <QueryParamBar params={queryParams}
                 width="800px"
                 onChange={(values, params) => {
-                  const newParams: RequestData<U> = Object.assign({}, searchParams);
+                  const newParams: RequestParamsType<U> = Object.assign({}, searchParams);
                   params.forEach((value) => {
                     Object.assign(newParams, { [value.key]: undefined });
                   });
@@ -121,7 +121,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
             let list: T[] = [];
             let success = true;
             if (request) {
-              const newParams: RequestData<U> = Object.assign({
+              const newParams: RequestParamsType<U> = Object.assign({
                 page: {
                   pageSize: params.pageSize,
                   current: params.current,

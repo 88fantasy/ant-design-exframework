@@ -37,7 +37,7 @@ export declare type ApiResponsePage<T> = {
   };
 };
 
-export declare type RequestData<T extends ParamsType> = T & {
+export declare type RequestParamsType<T extends ParamsType> = T & {
   page?: PaginationPage;
 };
 

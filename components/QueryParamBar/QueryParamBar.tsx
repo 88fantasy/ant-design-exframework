@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input, AutoComplete, Tag } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { SelectProps } from 'antd/es/select';
 
-export interface QueryParamType  {
+export type QueryParamType = {
   /**
    * 提交字段
    */
@@ -13,88 +13,69 @@ export interface QueryParamType  {
    */
   title: string;
   type: 'string' | 'dictionary';
-}
+};
 
-
-export interface QueryParamTypeValue extends QueryParamType {
+export type QueryParamTypeValue = QueryParamType & {
   value: string;
-}
+};
 
-export interface QueryParamBarPropsType {
+export type QueryParamBarProps = {
   params: QueryParamType[];
-  onChange: (values: QueryParamTypeValue[], params:QueryParamType[]) => void;
+  onChange: (values: QueryParamTypeValue[], params: QueryParamType[]) => void;
   width?: number | string;
-  placeholder?:string;
-}
+  placeholder?: string;
+};
 
-export interface QueryParamBarStateType {
-  options: SelectProps<object>['options'];
-  tags: Array<QueryParamTypeValue>;
-  searchValue: string;
-}
+/**
+ * 单行查询框
+ * 用于8个查询条件以内
+ * @param props 
+ */
+const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
+  const [options, setOptions] = useState<SelectProps<object>['options']>([]);
+  const [tags, setTags] = useState<QueryParamTypeValue[]>([]);
+  const [searchValue, setSearchValue] = useState<string>('');
 
+  const { width, placeholder = '多个关键字用竖线|分隔,多个过滤标签用回车键分隔', onChange, params } = props;
 
-class QueryParamBar extends React.Component<QueryParamBarPropsType, QueryParamBarStateType>{
-
-  state: QueryParamBarStateType = {
-    options: [],
-    tags: [],
-    searchValue: '',
-  }
-
-  onSelect = (v: string, option: any) => {
-    const { onChange, params } = this.props;
+  const onSelect = (v: string, option: any) => {
     const { item } = option;
-    const { tags } = this.state;
     const value = v.substring(0, v.length - 1);
 
     const tag = tags.find((t) => t.key === item.key);
     if (tag) {
       tag.value = value;
-    }
-    else {
+    } else {
       const newTag: QueryParamTypeValue = {
         ...option.item,
         value,
       };
       tags.push(newTag);
     }
-    this.setState({
-      ...this.state,
-      options: [],
-      searchValue: '',
-    });
+    setOptions([]);
+    setSearchValue('');
     onChange(tags, params);
-  }
+  };
 
-  onEnter = () => {
-    const { searchValue } = this.state;
+  const onEnter = () => {
     if (!searchValue || searchValue.length === 0) {
-      const { onChange, params } = this.props;
-      const { tags } = this.state;
       onChange(tags, params);
     }
+  };
 
-  }
+  const onSearch = (value: string) => {
+    setOptions(value ? searchResult(value) : []);
+    setSearchValue(value);
+  };
 
-  onSearch = (value: string) => {
-    this.setState({
-      ...this.state,
-      options: value ? this.searchResult(value) : [],
-      searchValue: value,
-    });
-  }
-
-  searchResult = (query: string) => {
-
-    const { params } = this.props;
-
+  const searchResult = (query: string) => {
     return params.map((item, idx) => {
       const category = `${query}${idx}`;
       return {
         value: category,
         label: (
-          <div key={`autocomplete-${item.key}`}
+          <div
+            key={`autocomplete-${item.key}`}
             style={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -108,43 +89,36 @@ class QueryParamBar extends React.Component<QueryParamBarPropsType, QueryParamBa
         item,
       };
     });
-  }
+  };
 
-  render() {
-    const { width } = this.props;
-    const { options, tags, searchValue } = this.state;
-
-    const { placeholder = '多个关键字用竖线|分隔,多个过滤标签用回车键分隔' } = this.props;
-
-    return (
-      <AutoComplete
-        options={options}
-        onSelect={this.onSelect}
-        onSearch={this.onSearch}
-        value={searchValue}
-      >
-        <Input.Search
-          prefix={
-            <>
-              {
-                tags.map((item, idx: number) => {
-                  return <Tag key={`tag-${item.key}`} closable onClose={() => {
+  return (
+    <AutoComplete options={options} onSelect={onSelect} onSearch={onSearch} value={searchValue}>
+      <Input.Search
+        prefix={
+          <>
+            {tags.map((item, idx: number) => {
+              return (
+                <Tag
+                  key={`tag-${item.key}`}
+                  closable
+                  onClose={() => {
                     tags.splice(idx, 1);
-                    this.setState({ ...this.state, tags });
-                  }}>{item.title}:{item.value}</Tag>
-                })
-              }
-            </>
-          }
-          style={{ width: `${width ? width : '600px'}` }}
-          placeholder={placeholder}
-          suffix={<InfoCircleOutlined />}
-          onPressEnter={this.onEnter}
-          onSearch={this.onEnter}
-        />
-      </AutoComplete>
-    );
-  }
+                    setTags(tags);
+                  }}
+                >
+                  {item.title}:{item.value}
+                </Tag>
+              );
+            })}
+          </>
+        }
+        style={{ width: `${width ? width : '600px'}` }}
+        placeholder={placeholder}
+        suffix={<InfoCircleOutlined />}
+        onPressEnter={onEnter}
+        onSearch={onEnter}
+      />
+    </AutoComplete>
+  );
 };
-
 export default QueryParamBar;

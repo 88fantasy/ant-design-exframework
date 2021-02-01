@@ -1,6 +1,6 @@
 import { RequestOptionsInit } from "umi-request";
 import request from 'umi-request';
-import StandardError from "./StandardError";
+import StandardError from "../Module/StandardError";
 import _ from 'lodash';
 import { ProColumns } from "@ant-design/pro-table";
 
