@@ -120,6 +120,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
           request={async (params = {}, sort, filter) => {
             let list: T[] = [];
             let success = true;
+            let total = 0;
             if (request) {
               const newParams: RequestParamsType<U> = Object.assign({
                 page: {
@@ -131,6 +132,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
               await request(newParams, sort, filter).then((res) => {
                 if (res && res.data) {
                   list = res.data.list;
+                  total = res.data.pager.total;
                 }
               }).catch(() => {
                 success = false;
@@ -139,7 +141,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
             return {
               data: list,
               success,
-              total: list.length,
+              total,
             };
           }}
           columns={columns}
