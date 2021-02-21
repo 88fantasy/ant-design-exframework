@@ -1,0 +1,190 @@
+@login-blue: #46b3ff;
+@login-dark-blue: #0062b1;
+@login-light-blue: #6e94ff;
+@login-light-black: rgba(0, 0, 0, 0.45);
+@light-blue: #d1e7ff;
+@dashboard-blue: #0074ba;
+@dashboard-light-blue: #7cbfff;
+@dashboard-dark-blue: #135db6;
+@dashboard-gray: #999999;
+@dashboard-light-gray: #6aa4d0;
+@dashboard-black: #041431;
+@dashboard-light-black: #cbcbcc;
+@dashboard-orange: #e6a210;
+@dashboard-title-gray: #666666;
+@publicNews-blue: #ebf5ff;
+@publicNews-light-blue: #b2c7ff;
+@publicNews-gray: #cccccc;
+@publicNews-light-gray: #f0f0f0;
+@publicNews-dark-blue: #55a9ff;
+@headerMenu-blue: #6f94ff;
+
+@router-menu-cls: ~'router-menu';
+
+.@{router-menu-cls} {
+  &-menuListWrapper {
+    position: relative;
+    font-size: 18px;
+    display: flex;
+  }
+
+  &-menuIcon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    cursor: pointer;
+
+    &::before {
+      content: '';
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 0;
+      width: 0;
+      border: 10px solid;
+      border-color: transparent transparent white;
+      z-index: 99;
+    }
+
+    &.show {
+      &::before {
+        display: block;
+      }
+    }
+
+    &-iconAdd,
+    &-iconDefault {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      background: no-repeat center center / contain;
+    }
+
+    &-iconAdd {
+      background-image: url('../assets/menuAdd.png');
+    }
+
+    &-iconDefault {
+      background-image: url('../assets/menu.png');
+    }
+  }
+
+  &-menuPopup {
+    padding: 20px 40px 40px;
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+    width: 70vw;
+    max-width: 1000px;
+    z-index: 9;
+    box-shadow: 0px 1px 30px 0px rgba(4, 0, 0, 0.09);
+  }
+
+  &-menuHeader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  &-buttonWrapper {
+    margin-left: 20px;
+
+    span {
+      display: inline-block;
+      line-height: 20px;
+      font-size: 14px;
+      padding: 3px 15px;
+      border-radius: 5px;
+      border: 1px solid @dashboard-title-gray;
+      color: @dashboard-title-gray;
+      margin-right: 10px;
+      cursor: pointer;
+
+      &.save {
+        background-color: @headerMenu-blue;
+        color: white;
+      }
+    }
+  }
+
+  &-menuWrapper {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &-menuItemWrapper {
+    margin-right: 80px;
+    width: 150px;
+  }
+
+  &-menuItemHeader {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #cccccc;
+
+    :global {
+      .anticon {
+        font-size: 20px;
+        margin-right: 10px;
+        color: #4e83c6;
+      }
+    }
+  }
+
+  &-menuItemHeaderName {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 40px;
+  }
+
+  &-menuItemContent {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    cursor: pointer;
+
+    span {
+      font-size: 14px;
+      line-height: 28px;
+
+      &:hover {
+        color: @login-blue;
+      }
+    }
+  }
+
+  &-menuCheckboxContent {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  &-menuCheckboxItem {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: right;
+  }
+
+  &-disabledBox {
+    :global {
+      .ant-popover-inner {
+        background-color: transparent;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .@{router-menu-cls} {
+    display: none;
+  }
+}
