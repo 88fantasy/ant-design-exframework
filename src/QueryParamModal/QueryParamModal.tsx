@@ -223,6 +223,7 @@ export type QueryParamModalProps = {
   formStyle?: 'table' | 'standard';
   /**
    * 查询框字段信息
+   * @default []
    */
   fields: QueryParamModalField[];
   /**
@@ -317,7 +318,7 @@ const getDefaultOpers = (field: QueryParamModalField): string[] => {
 const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
   const {
     title = '高级查询',
-    fields,
+    fields = [],
     formRef: propsFormRef,
     onFinish,
     // formStyle = 'table',

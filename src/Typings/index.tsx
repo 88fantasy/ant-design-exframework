@@ -3,24 +3,24 @@ import type { ParamsType } from '@ant-design/pro-provider';
 import type { Rule } from 'antd/lib/form';
 import moment from 'moment';
 
-export declare type RuleProColumns = ProColumns & { rules?: Rule[] };
+export type RuleProColumns = ProColumns & { rules?: Rule[] };
 
 export type QueryPageBaseRequest = {
   sorter?: string;
   page?: PaginationPage;
 };
 
-export declare type PaginationPage = {
+export type PaginationPage = {
   current?: number;
   pageSize?: number;
 };
 
-export declare type PaginationPager = PaginationPage & {
+export type PaginationPager = PaginationPage & {
   size: number;
   total: number;
 };
 
-export declare type ApiResponseData<T> = {
+export type ApiResponseData<T> = {
   code: number;
   status: boolean;
   message?: string;

@@ -3,7 +3,6 @@ export { default as RouterMenu } from './RouterMenu';
 export { default as Hov } from './Hov';
 export { default as QueryParamModal } from './QueryParamModal';
 export { default as Permission } from './Permission';
-export { default as Foo } from './Foo';
 
 export {
   PaginationPage,
@@ -11,6 +10,8 @@ export {
   RuleProColumns,
   ApiResponseData,
   ApiResponsePage,
+  defaultApiResponseData,
+  defaultApiResponsePage,
   defaultRangePickerProps,
   defaultMomentDate,
   defaultMomentDateTime,

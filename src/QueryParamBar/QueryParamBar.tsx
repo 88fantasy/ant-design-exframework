@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Input, AutoComplete, Tag } from 'antd';
+import { Input, AutoComplete, Tag, Popover, Button, Menu } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { SelectProps } from 'antd/es/select';
+import { TooltipPlacement } from 'antd/lib/tooltip';
 
 export type QueryParamType = {
   /**
@@ -24,6 +25,7 @@ export type QueryParamBarProps = {
   onChange: (values: QueryParamTypeValue[], params: QueryParamType[]) => void;
   width?: number | string;
   placeholder?: string;
+  placement?: TooltipPlacement;
 };
 
 /**
@@ -32,34 +34,46 @@ export type QueryParamBarProps = {
  * @param props
  */
 const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
-  const [options, setOptions] = useState<SelectProps<object>['options']>([]);
+  const inputRef = React.useRef<any>(null);
   const [tags, setTags] = useState<QueryParamTypeValue[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
+  const [popState, setPopState] = useState<{ [x: string]: boolean }>({});
+  const [menuVisiable, setMenuVisiable] = useState<boolean>(false);
 
   const {
     width,
     placeholder = '多个关键字用竖线|分隔,多个过滤标签用回车键分隔',
     onChange,
     params,
+    placement = 'bottomLeft',
   } = props;
 
-  const onSelect = (v: string, option: any) => {
-    const { item } = option;
-    const value = v.substring(0, v.length - 1);
+  const paramsMap: { [x: string]: QueryParamType } = params.reduce(
+    (obj, item) => ({
+      ...obj,
+      [item['key']]: item,
+    }),
+    {},
+  );
 
-    const tag = tags.find((t) => t.key === item.key);
-    if (tag) {
-      tag.value = value;
-    } else {
-      const newTag: QueryParamTypeValue = {
-        ...option.item,
-        value,
-      };
-      tags.push(newTag);
+  const onSelect = (v: string, item: QueryParamType) => {
+    setMenuVisiable(false);
+    if (v && v.length > 0) {
+      const value = v.substring(0, v.length - 1);
+
+      const tag = tags.find((t) => t.key === item.key);
+      if (tag) {
+        tag.value = value;
+      } else {
+        const newTag: QueryParamTypeValue = {
+          ...item,
+          value,
+        };
+        tags.push(newTag);
+      }
+      setSearchValue('');
+      onChange(tags, params);
     }
-    setOptions([]);
-    setSearchValue('');
-    onChange(tags, params);
   };
 
   const onEnter = () => {
@@ -68,40 +82,25 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
     }
   };
 
-  const onSearch = (value: string) => {
-    setOptions(value ? searchResult(value) : []);
-    setSearchValue(value);
-  };
-
-  const searchResult = (query: string) => {
-    return params.map((item, idx) => {
-      const category = `${query}${idx}`;
-      return {
-        value: category,
-        label: (
-          <div
-            key={`autocomplete-${item.key}`}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span>
-              {item.title}:{query}
-            </span>
-          </div>
-        ),
-        item,
-      };
-    });
-  };
-
   return (
-    <AutoComplete
-      options={options}
-      onSelect={onSelect}
-      onSearch={onSearch}
-      value={searchValue}
+    <Popover
+      content={
+        <Menu
+          mode="vertical"
+          onSelect={({ item, key, keyPath, domEvent }) => {
+            const param = paramsMap[key];
+            onSelect(searchValue, param);
+          }}
+        >
+          {params &&
+            params.map((param) => {
+              return <Menu.Item key={param.key}>{param.title}</Menu.Item>;
+            })}
+        </Menu>
+      }
+      visible={menuVisiable}
+      placement={placement}
+      // onVisibleChange={this.handleVisibleChange}
     >
       <Input.Search
         prefix={
@@ -127,8 +126,19 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
         suffix={<InfoCircleOutlined />}
         onPressEnter={onEnter}
         onSearch={onEnter}
+        onFocus={(e) => {
+          setMenuVisiable(true);
+        }}
+        onBlur={(e) => {
+          setMenuVisiable(false);
+        }}
+        onChange={(e) => {
+          setSearchValue(e.target.value);
+        }}
+        ref={inputRef}
+        // value={searchValue}
       />
-    </AutoComplete>
+    </Popover>
   );
 };
 export default QueryParamBar;
