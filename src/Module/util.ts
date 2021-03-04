@@ -2,7 +2,7 @@ import { pick, mergeWith } from 'lodash';
 import type { QueryParamModalField } from '../QueryParamModal';
 
 export function pickBy(commonConfig: any, array: any): QueryParamModalField[] {
-  let config = {};
+  let config: { [x: string]: any } = {};
   if (Array.isArray(commonConfig)) {
     commonConfig.forEach((item) => {
       // @ts-ignore

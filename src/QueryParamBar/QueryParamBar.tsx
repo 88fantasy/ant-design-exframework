@@ -21,10 +21,29 @@ export type QueryParamTypeValue = QueryParamType & {
 };
 
 export type QueryParamBarProps = {
+  /**
+   * 查询条件
+   * @default []
+   */
   params: QueryParamType[];
+  /**
+   * 条件变更时触发回调函数
+   */
   onChange: (values: QueryParamTypeValue[], params: QueryParamType[]) => void;
+  /**
+   * 输入框长度
+   * @default 600
+   */
   width?: number | string;
+  /**
+   * 输入提示
+   * @default "多个关键字用竖线|分隔,多个过滤标签用回车键分隔"
+   */
   placeholder?: string;
+  /**
+   * 条件选择显示位置
+   * @default "bottomLeft"
+   */
   placement?: TooltipPlacement;
 };
 
@@ -41,10 +60,10 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
   const [menuVisiable, setMenuVisiable] = useState<boolean>(false);
 
   const {
-    width,
+    width = 600,
     placeholder = '多个关键字用竖线|分隔,多个过滤标签用回车键分隔',
     onChange,
-    params,
+    params = [],
     placement = 'bottomLeft',
   } = props;
 
