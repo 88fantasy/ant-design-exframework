@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Input, AutoComplete, Tag, Popover, Button, Menu } from 'antd';
+import { Input, AutoComplete, Tag, Modal } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { SelectProps } from 'antd/es/select';
-import { TooltipPlacement } from 'antd/lib/tooltip';
+import Components from './Components';
+import { Moment } from 'moment';
+import Hov from '../Hov';
+
+export type QueryParamFieldType = keyof typeof Components;
 
 export type QueryParamType = {
   /**
@@ -13,7 +17,14 @@ export type QueryParamType = {
    * 显示名称
    */
   title: string;
-  type: 'string' | 'dictionary';
+  /**
+   * 编辑器类型
+   */
+  type: QueryParamFieldType;
+  /**
+   * 编辑器属性, 参考各编辑器文档
+   */
+  fieldProps?: any;
 };
 
 export type QueryParamTypeValue = QueryParamType & {
@@ -40,11 +51,6 @@ export type QueryParamBarProps = {
    * @default "多个关键字用竖线|分隔,多个过滤标签用回车键分隔"
    */
   placeholder?: string;
-  /**
-   * 条件选择显示位置
-   * @default "bottomLeft"
-   */
-  placement?: TooltipPlacement;
 };
 
 /**
@@ -53,34 +59,51 @@ export type QueryParamBarProps = {
  * @param props
  */
 const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
-  const inputRef = React.useRef<any>(null);
   const [tags, setTags] = useState<QueryParamTypeValue[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
-  const [popState, setPopState] = useState<{ [x: string]: boolean }>({});
-  const [menuVisiable, setMenuVisiable] = useState<boolean>(false);
+  const [modalVisiable, setModalVisiable] = useState<boolean>(false);
+  const [modalNode, setModalNode] = useState<React.ReactNode>(<></>);
+  const [currentItem, setCurrentItem] = useState<QueryParamType>();
+  const [value, setValue] = useState<string>('');
 
   const {
     width = 600,
     placeholder = '多个关键字用竖线|分隔,多个过滤标签用回车键分隔',
     onChange,
     params = [],
-    placement = 'bottomLeft',
   } = props;
 
-  const paramsMap: { [x: string]: QueryParamType } = params.reduce(
-    (obj, item) => ({
-      ...obj,
-      [item['key']]: item,
-    }),
-    {},
-  );
+  const onChanges = {
+    Group: (checkedValue: string[]) => {
+      setValue(checkedValue.join('|'));
+    },
+    RangePicker: (dates: [Moment, Moment], dateStrings: [string, string]) => {
+      setValue('');
+    },
+    Input: (v: string) => {
+      setValue(v);
+    },
+    Hov: (v: string) => {
+      setValue(v);
+    },
+  };
 
-  const onSelect = (v: string, item: QueryParamType) => {
-    setMenuVisiable(false);
-    if (v && v.length > 0) {
-      const value = v.substring(0, v.length - 1);
+  const renderField = (item: QueryParamType, restFieldProps?: any) => {
+    const { key, fieldProps, type } = item;
+    const Component = Components[item.type] as any;
+    return (
+      <Component
+        {...fieldProps}
+        onChange={onChanges[type]}
+        {...restFieldProps}
+      />
+    );
+  };
 
-      const tag = tags.find((t) => t.key === item.key);
+  const setItemValue = (item: QueryParamType | undefined, value: string) => {
+    if (item) {
+      const tmpTags = [...tags];
+      const tag = tmpTags.find((t) => t.key === item.key);
       if (tag) {
         tag.value = value;
       } else {
@@ -88,10 +111,31 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
           ...item,
           value,
         };
-        tags.push(newTag);
+        tmpTags.push(newTag);
       }
+      setTags(tmpTags);
       setSearchValue('');
-      onChange(tags, params);
+      onChange(tmpTags, params);
+    }
+  };
+
+  const onSelect = (v: string) => {
+    const item = params.find((p) => p.key === v);
+    if (item) {
+      setCurrentItem(item);
+      if (item.type === 'Input') {
+        setItemValue(item, searchValue);
+      } else if (item.type === 'Hov') {
+        Hov.show({
+          ...item.fieldProps,
+          onFinish: (value: any) => {
+            setItemValue(item, value);
+          },
+        });
+      } else {
+        setModalNode(renderField(item));
+        setModalVisiable(true);
+      }
     }
   };
 
@@ -101,63 +145,82 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
     }
   };
 
-  return (
-    <Popover
-      content={
-        <Menu
-          mode="vertical"
-          onSelect={({ item, key, keyPath, domEvent }) => {
-            const param = paramsMap[key];
-            onSelect(searchValue, param);
+  const onSearch = (value: string) => {
+    setSearchValue(value);
+  };
+
+  const options = params.map((item, idx) => {
+    return {
+      value: item.key,
+      label: (
+        <div
+          key={`autocomplete-${item.key}`}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
           }}
         >
-          {params &&
-            params.map((param) => {
-              return <Menu.Item key={param.key}>{param.title}</Menu.Item>;
-            })}
-        </Menu>
-      }
-      visible={menuVisiable}
-      placement={placement}
-      // onVisibleChange={this.handleVisibleChange}
-    >
-      <Input.Search
-        prefix={
-          <>
-            {tags.map((item, idx: number) => {
-              return (
-                <Tag
-                  key={`tag-${item.key}`}
-                  closable
-                  onClose={() => {
-                    tags.splice(idx, 1);
-                    setTags(tags);
-                  }}
-                >
-                  {item.title}:{item.value}
-                </Tag>
-              );
-            })}
-          </>
-        }
-        style={{ width: `${width ? width : '600px'}` }}
-        placeholder={placeholder}
-        suffix={<InfoCircleOutlined />}
-        onPressEnter={onEnter}
-        onSearch={onEnter}
-        onFocus={(e) => {
-          setMenuVisiable(true);
-        }}
-        onBlur={(e) => {
-          setMenuVisiable(false);
-        }}
-        onChange={(e) => {
-          setSearchValue(e.target.value);
-        }}
-        ref={inputRef}
-        // value={searchValue}
-      />
-    </Popover>
+          <span>{item.title}</span>
+        </div>
+      ),
+      item,
+    };
+  });
+
+  const onModalConfirm = () => {
+    console.log(value);
+    setItemValue(currentItem, value);
+    setModalVisiable(false);
+  };
+
+  const onModalCancel = () => {
+    setModalVisiable(false);
+  };
+
+  return (
+    <>
+      <AutoComplete
+        options={options}
+        onSelect={onSelect}
+        onSearch={onSearch}
+        value={searchValue}
+      >
+        <Input.Search
+          prefix={
+            <>
+              {tags.map((item, idx: number) => {
+                return (
+                  <Tag
+                    key={`tag-${item.key}`}
+                    closable
+                    onClose={() => {
+                      tags.splice(idx, 1);
+                      setTags(tags);
+                    }}
+                  >
+                    {item.title}:{item.value}
+                  </Tag>
+                );
+              })}
+            </>
+          }
+          style={{ width: width || '600px' }}
+          placeholder={placeholder}
+          suffix={<InfoCircleOutlined />}
+          onPressEnter={onEnter}
+          onSearch={onEnter}
+        />
+      </AutoComplete>
+      <Modal
+        visible={modalVisiable}
+        onOk={onModalConfirm}
+        onCancel={onModalCancel}
+        okText="确认"
+        cancelText="取消"
+      >
+        {modalNode}
+      </Modal>
+    </>
   );
 };
 export default QueryParamBar;

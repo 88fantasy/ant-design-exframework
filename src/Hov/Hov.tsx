@@ -5,6 +5,7 @@ import type { SorterResult, SortOrder } from 'antd/es/table/interface';
 import QueryParamBar, { QueryParamType } from '../QueryParamBar';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import type { ApiResponsePage, RequestParamsType } from '../Typings';
+import show, { HovFuncProps } from './method';
 
 export type HovColumn = ProColumns & {};
 
@@ -16,9 +17,16 @@ export type HovProps<T, U extends ParamsType> = {
    */
   title?: string;
   /**
+   * 抽屉高度
+   * @default 500
+   */
+  height?: number;
+  /**
    * 选定值
    */
   value?: number | string;
+
+  visible?: boolean;
   /**
    * 表头列定义
    */
@@ -58,6 +66,8 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
   const {
     title,
     value,
+    height = 500,
+    visible: visibleRef,
     columns,
     returnKey,
     itemKey,
@@ -66,7 +76,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
     request,
   } = props;
 
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(visibleRef);
   const actionRef = useRef<ActionType>();
   const [sorter, setSorter] = useState<string>('');
   const [searchParams, setSearchParams] = useState<RequestParamsType<U>>();
@@ -88,7 +98,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
         title={title}
         placement="bottom"
         visible={visible}
-        height="500"
+        height={height}
         onClose={handleCancel}
       >
         <ProTable<T>
@@ -173,6 +183,10 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
       </Drawer>
     </>
   );
+};
+
+Hov.show = (props: HovFuncProps) => {
+  return show(props);
 };
 
 export default Hov;

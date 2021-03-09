@@ -12,6 +12,12 @@
   desc="通过 `onFinish` 获取选定的值">
 </code>
 
+<code
+  src="../../src/Hov/demos/static.tsx"
+  title="函数用法"
+  desc="通过 `onFinish` 获取选定的值">
+</code>
+
 <API
   src="../../src/Hov/Hov.tsx">
 </API>

@@ -23,7 +23,7 @@ const Index: React.FC = () => {
         {
           key: 'code',
           title: '编码',
-          type: 'string',
+          type: 'Input',
         },
       ]}
       request={(params = {}) => {
