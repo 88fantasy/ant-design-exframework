@@ -60,7 +60,7 @@ export default () => (
             {
               key: 'code',
               title: '编码',
-              type: 'string',
+              type: 'Input',
             },
           ],
           request: async (params = {}) => {

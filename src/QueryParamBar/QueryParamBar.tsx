@@ -123,7 +123,7 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
     const item = params.find((p) => p.key === v);
     if (item) {
       setCurrentItem(item);
-      if (item.type === 'Input') {
+      if (item.type === 'Input' && v && v.trim().length > 0) {
         setItemValue(item, searchValue);
       } else if (item.type === 'Hov') {
         Hov.show({
