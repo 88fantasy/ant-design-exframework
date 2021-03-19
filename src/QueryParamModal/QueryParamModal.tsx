@@ -405,6 +405,7 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
         const opers = getDefaultOpers(_record.field);
         return (
           <ProFormSelect
+            allowClear={false}
             options={opers.map((key) => {
               const oper = key as FilterConditionOper;
               return {
