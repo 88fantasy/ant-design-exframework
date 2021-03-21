@@ -11,7 +11,7 @@ function getRootPrefixCls() {
 
 // type ConfigUpdate = ModalFuncProps | ((prevConfig: ModalFuncProps) => ModalFuncProps);
 
-export type HovFuncProps = HovProps<any, any> & {};
+export type HovFuncProps = HovProps<any> & {};
 
 export type HovFunc = (
   props: HovFuncProps,

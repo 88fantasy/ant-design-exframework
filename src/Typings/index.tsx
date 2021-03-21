@@ -59,8 +59,9 @@ export type RequestParamsType<T extends ParamsType> = T & {
   page?: PaginationPage;
 };
 
-export type FilterCondition = {
-  key: string;
+export type RequestConditionsType = {
+  conditions?: FilterCondition[];
+  page?: PaginationPage;
 };
 
 export const defaultRangePickerProps = {
@@ -81,3 +82,111 @@ export const defaultRangePickerProps = {
 
 export const defaultMomentDate = 'YYYY-MM-DD';
 export const defaultMomentDateTime = 'YYYY-MM-DD HH:mm:ss';
+
+enum FilterConditionOper {
+  /**
+   * 等于
+   */
+  EQUAL = 'EQUAL',
+  /**
+   * 大于
+   */
+  GREATER = 'GREATER',
+  /**
+   * 小于
+   */
+  LESS = 'LESS',
+  /**
+   * 介于
+   */
+  BETWEEN = 'BETWEEN',
+  /**
+   * 大于等于
+   */
+  GREATER_EQUAL = 'GREATER_EQUAL',
+  /**
+   * 小于等于
+   */
+  LESS_EQUAL = 'LESS_EQUAL',
+  /**
+   * 包含
+   */
+  IN = 'IN',
+  /**
+   * 匹配
+   */
+  MATCHING = 'MATCHING',
+  /**
+   * 不等于
+   */
+  NOT_EQUAL = 'NOT_EQUAL',
+  /**
+   * 为空
+   */
+  ISNULL = 'IS_NULL',
+  /**
+   * 不为空
+   */
+  IS_NOT_NULL = 'IS_NOT_NULL',
+  /**
+   * 自定义
+   */
+  STR = 'STR',
+}
+
+export type FilterConditionOperType = keyof typeof FilterConditionOper;
+
+enum FilterConditionDataTypeEnum {
+  /**
+   * 字符串
+   */
+  STRING = 'STRING',
+  /**
+   * 数组
+   */
+  LIST = 'LIST',
+  /**
+   * 数字
+   */
+  NUMBER = 'NUMBER',
+  /**
+   * 布尔
+   */
+  BOOLEAN = 'BOOLEAN',
+  /**
+   * JSON
+   */
+  JSON = 'JSON',
+  /**
+   * 日期
+   */
+  DATE = 'DATE',
+  /**
+   * 日期时间
+   */
+  DATETIME = 'DATETIME',
+}
+
+export type FilterConditionDataType = keyof typeof FilterConditionDataTypeEnum;
+
+/**
+ * 查询条件
+ */
+export type FilterCondition = {
+  /**
+   * 提交字段
+   */
+  key: string;
+  /**
+   * 操作符
+   */
+  oper: FilterConditionOperType;
+  /**
+   * 值
+   */
+  filterValue: any;
+  /**
+   * 数据类型
+   */
+  filterDataType: FilterConditionDataType;
+};

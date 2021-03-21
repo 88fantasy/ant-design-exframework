@@ -14,117 +14,14 @@ import type { FormInstance, Rule } from 'antd/lib/form';
 import Components from './Components';
 import { ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import { Moment } from 'moment';
-import { defaultMomentDateTime } from '../Typings';
+import {
+  defaultMomentDateTime,
+  FilterCondition,
+  FilterConditionOperType,
+  FilterConditionDataType,
+} from '../Typings';
 
 import './style';
-
-enum FilterConditionOper {
-  /**
-   * 等于
-   */
-  EQUAL = 'EQUAL',
-  /**
-   * 大于
-   */
-  GREATER = 'GREATER',
-  /**
-   * 小于
-   */
-  LESS = 'LESS',
-  /**
-   * 介于
-   */
-  BETWEEN = 'BETWEEN',
-  /**
-   * 大于等于
-   */
-  GREATER_EQUAL = 'GREATER_EQUAL',
-  /**
-   * 小于等于
-   */
-  LESS_EQUAL = 'LESS_EQUAL',
-  /**
-   * 包含
-   */
-  IN = 'IN',
-  /**
-   * 匹配
-   */
-  MATCHING = 'MATCHING',
-  /**
-   * 不等于
-   */
-  NOT_EQUAL = 'NOT_EQUAL',
-  /**
-   * 为空
-   */
-  ISNULL = 'IS_NULL',
-  /**
-   * 不为空
-   */
-  IS_NOT_NULL = 'IS_NOT_NULL',
-  /**
-   * 自定义
-   */
-  STR = 'STR',
-}
-
-export type FilterConditionOperType = keyof typeof FilterConditionOper;
-
-enum FilterConditionDataTypeEnum {
-  /**
-   * 字符串
-   */
-  STRING = 'STRING',
-  /**
-   * 数组
-   */
-  LIST = 'LIST',
-  /**
-   * 数字
-   */
-  NUMBER = 'NUMBER',
-  /**
-   * 布尔
-   */
-  BOOLEAN = 'BOOLEAN',
-  /**
-   * JSON
-   */
-  JSON = 'JSON',
-  /**
-   * 日期
-   */
-  DATE = 'DATE',
-  /**
-   * 日期时间
-   */
-  DATETIME = 'DATETIME',
-}
-
-export type FilterConditionDataType = keyof typeof FilterConditionDataTypeEnum;
-
-/**
- * 查询条件
- */
-export type FilterCondition = {
-  /**
-   * 提交字段
-   */
-  key: string;
-  /**
-   * 操作符
-   */
-  oper: FilterConditionOperType;
-  /**
-   * 值
-   */
-  filterValue: any;
-  /**
-   * 数据类型
-   */
-  filterDataType: FilterConditionDataType;
-};
 
 export type QueryParamModalFieldType = keyof typeof Components;
 
@@ -203,7 +100,7 @@ export type FilerConditionRow = {
    * 操作符
    * @default 可选操作数组第一个
    */
-  oper?: FilterConditionOper;
+  oper?: FilterConditionOperType;
   /**
    * 字段设置
    */
@@ -236,31 +133,31 @@ export type QueryParamModalProps = {
   onFinish: (conditions: FilterCondition[]) => void;
 };
 
-const getOperLabel = (oper: FilterConditionOper) => {
+const getOperLabel = (oper: FilterConditionOperType) => {
   switch (oper) {
-    case FilterConditionOper.EQUAL:
+    case 'EQUAL':
       return '=';
-    case FilterConditionOper.NOT_EQUAL:
+    case 'NOT_EQUAL':
       return '!=';
-    case FilterConditionOper.GREATER:
+    case 'GREATER':
       return '>';
-    case FilterConditionOper.GREATER_EQUAL:
+    case 'GREATER_EQUAL':
       return '>=';
-    case FilterConditionOper.LESS:
+    case 'LESS':
       return '<';
-    case FilterConditionOper.LESS_EQUAL:
+    case 'LESS_EQUAL':
       return '<=';
-    case FilterConditionOper.BETWEEN:
+    case 'BETWEEN':
       return '介于';
-    case FilterConditionOper.IN:
+    case 'IN':
       return '包含';
-    case FilterConditionOper.ISNULL:
+    case 'ISNULL':
       return '为空';
-    case FilterConditionOper.IS_NOT_NULL:
+    case 'IS_NOT_NULL':
       return '不为空';
-    case FilterConditionOper.MATCHING:
+    case 'MATCHING':
       return '匹配';
-    case FilterConditionOper.STR:
+    case 'STR':
       return '自定义';
     default:
       return '未定义';
@@ -273,14 +170,14 @@ const getDefaultFieldDataType = (
   switch (type) {
     case 'ProFormSelect':
     case 'ProFormDateTimeRangePicker':
-      return FilterConditionDataTypeEnum.LIST;
+      return 'LIST';
     case 'ProFormDatePicker':
-      return FilterConditionDataTypeEnum.DATE;
+      return 'DATE';
     case 'ProFormDigit':
-      return FilterConditionDataTypeEnum.NUMBER;
+      return 'NUMBER';
     case 'ProFormText':
     case 'Hov':
-      return FilterConditionDataTypeEnum.STRING;
+      return 'STRING';
   }
 };
 
@@ -290,27 +187,16 @@ const getDefaultOpers = (field: QueryParamModalField): string[] => {
   } else {
     switch (field.type) {
       case 'ProFormSelect':
-        return [FilterConditionOper.IN, FilterConditionOper.ISNULL];
+        return ['IN', 'ISNULL'];
       case 'ProFormDigit':
       case 'ProFormDatePicker':
-        return [
-          FilterConditionOper.GREATER,
-          FilterConditionOper.LESS,
-          FilterConditionOper.GREATER_EQUAL,
-          FilterConditionOper.LESS_EQUAL,
-          FilterConditionOper.ISNULL,
-        ];
+        return ['GREATER', 'LESS', 'GREATER_EQUAL', 'LESS_EQUAL', 'ISNULL'];
       case 'ProFormDateTimeRangePicker':
-        return [FilterConditionOper.BETWEEN];
+        return ['BETWEEN'];
       case 'ProFormText':
-        return [
-          FilterConditionOper.MATCHING,
-          FilterConditionOper.EQUAL,
-          FilterConditionOper.ISNULL,
-          FilterConditionOper.IS_NOT_NULL,
-        ];
+        return ['MATCHING', 'EQUAL', 'ISNULL', 'IS_NOT_NULL'];
       case 'Hov':
-        return [FilterConditionOper.EQUAL, FilterConditionOper.NOT_EQUAL];
+        return ['EQUAL', 'NOT_EQUAL'];
     }
   }
 };
@@ -407,7 +293,7 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
           <ProFormSelect
             allowClear={false}
             options={opers.map((key) => {
-              const oper = key as FilterConditionOper;
+              const oper = key as FilterConditionOperType;
               return {
                 label: getOperLabel(oper),
                 value: key,
@@ -432,7 +318,7 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
       checkbox: false,
       key: field.key,
       label: field.title,
-      oper: field.initialOperValue as FilterConditionOper,
+      oper: field.initialOperValue as FilterConditionOperType,
       field,
     };
   });

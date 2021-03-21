@@ -5,6 +5,12 @@ import { SelectProps } from 'antd/es/select';
 import Components from './Components';
 import { Moment } from 'moment';
 import Hov from '../Hov';
+import {
+  defaultMomentDateTime,
+  FilterCondition,
+  FilterConditionOperType,
+  FilterConditionDataType,
+} from '../Typings';
 
 export type QueryParamFieldType = keyof typeof Components;
 
@@ -40,7 +46,7 @@ export type QueryParamBarProps = {
   /**
    * 条件变更时触发回调函数
    */
-  onChange: (values: QueryParamTypeValue[], params: QueryParamType[]) => void;
+  onChange: (conditions: FilterCondition[]) => void;
   /**
    * 输入框长度
    * @default 600
@@ -100,6 +106,46 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
     );
   };
 
+  const doQuery = () => {
+    const conditions: FilterCondition[] = tags.map(
+      ({ key, type, value, fieldProps }) => {
+        let oper: FilterConditionOperType;
+        let dataType: FilterConditionDataType;
+        let data;
+        switch (type) {
+          case 'Group':
+            oper = 'IN';
+            dataType = 'LIST';
+            data = value.split('|');
+            break;
+          case 'Hov':
+            oper = 'EQUAL';
+            dataType = 'STRING';
+            data = value;
+            break;
+          case 'Input':
+            oper = 'MATCHING';
+            dataType = 'STRING';
+            data = value;
+            break;
+          case 'RangePicker':
+            oper = 'BETWEEN';
+            dataType = 'LIST';
+            data = value.split('|');
+            break;
+        }
+
+        return {
+          key,
+          oper,
+          filterDataType: dataType,
+          filterValue: value,
+        };
+      },
+    );
+    onChange(conditions);
+  };
+
   const setItemValue = (item: QueryParamType | undefined, value: string) => {
     if (item) {
       const tmpTags = [...tags];
@@ -115,7 +161,7 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
       }
       setTags(tmpTags);
       setSearchValue('');
-      onChange(tmpTags, params);
+      doQuery();
     }
   };
 
@@ -143,7 +189,7 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
 
   const onEnter = () => {
     if (!searchValue || searchValue.length === 0) {
-      onChange(tags, params);
+      doQuery();
     }
   };
 

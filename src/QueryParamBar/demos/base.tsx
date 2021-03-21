@@ -85,6 +85,8 @@ export default () => (
         },
       },
     ]}
-    onChange={(values, params) => {}}
+    onChange={(conditions) => {
+      console.log(conditions);
+    }}
   />
 );

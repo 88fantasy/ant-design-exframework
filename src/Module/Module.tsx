@@ -122,7 +122,7 @@ const Module = <T, U extends ParamsType>(props: ModuleProps<T, U>) => {
           <QueryParamBar
             params={[]}
             {...queryProps}
-            onChange={(_values, _params) => {
+            onChange={(_conditions) => {
               //   const newParams = {
               //     ...searchParams,
               //   };

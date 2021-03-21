@@ -4,14 +4,19 @@ import type { ParamsType } from '@ant-design/pro-provider';
 import type { SorterResult, SortOrder } from 'antd/es/table/interface';
 import QueryParamBar, { QueryParamType } from '../QueryParamBar';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import type { ApiResponsePage, RequestParamsType } from '../Typings';
+import type {
+  ApiResponsePage,
+  FilterCondition,
+  RequestConditionsType,
+  RequestParamsType,
+} from '../Typings';
 import show, { HovFuncProps } from './method';
 
 export type HovColumn = ProColumns & {};
 
 export type HovParam = QueryParamType & {};
 
-export type HovProps<T, U extends ParamsType> = {
+export type HovProps<T> = {
   /**
    * 标题
    */
@@ -54,15 +59,13 @@ export type HovProps<T, U extends ParamsType> = {
    * 返回数据的请求
    */
   request?: (
-    params: RequestParamsType<U>,
+    params: RequestConditionsType,
     sort: Record<string, SortOrder>,
     filter: Record<string, React.ReactText[]>,
   ) => Promise<Partial<ApiResponsePage<T>>>;
 };
 
-const Hov = <T extends Record<string, any>, U extends ParamsType>(
-  props: HovProps<T, U>,
-) => {
+const Hov = <T extends Record<string, any>>(props: HovProps<T>) => {
   const {
     title,
     value,
@@ -79,7 +82,7 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
   const [visible, setVisible] = useState(visibleRef);
   const actionRef = useRef<ActionType>();
   const [sorter, setSorter] = useState<string>('');
-  const [searchParams, setSearchParams] = useState<RequestParamsType<U>>();
+  const [searchParams, setSearchParams] = useState<FilterCondition[]>([]);
 
   const showDrawer = () => {
     setVisible(true);
@@ -118,18 +121,8 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
               <QueryParamBar
                 params={queryParams}
                 width="800px"
-                onChange={(values, params) => {
-                  const newParams: RequestParamsType<U> = Object.assign(
-                    {},
-                    searchParams,
-                  );
-                  params.forEach((value) => {
-                    Object.assign(newParams, { [value.key]: undefined });
-                  });
-                  values.forEach((value) => {
-                    Object.assign(newParams, { [value.key]: value.value });
-                  });
-                  setSearchParams(newParams);
+                onChange={(conditions) => {
+                  setSearchParams(conditions);
                   actionRef.current?.reload();
                 }}
               />
@@ -140,15 +133,13 @@ const Hov = <T extends Record<string, any>, U extends ParamsType>(
             let success = true;
             let total = 0;
             if (request) {
-              const newParams: RequestParamsType<U> = Object.assign(
-                {
-                  page: {
-                    pageSize: params.pageSize,
-                    current: params.current,
-                  },
+              const newParams: RequestConditionsType = {
+                page: {
+                  pageSize: params.pageSize,
+                  current: params.current,
                 },
-                searchParams,
-              );
+                conditions: searchParams,
+              };
               Object.assign(newParams, { ...params });
               await request(newParams, sort, filter)
                 .then((res) => {
