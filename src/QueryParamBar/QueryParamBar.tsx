@@ -106,8 +106,9 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
     );
   };
 
-  const doQuery = () => {
-    const conditions: FilterCondition[] = tags.map(
+  const doQuery = (values?: QueryParamTypeValue[]) => {
+    const t = values || tags;
+    const conditions: FilterCondition[] = t.map(
       ({ key, type, value, fieldProps }) => {
         let oper: FilterConditionOperType;
         let dataType: FilterConditionDataType;
@@ -161,7 +162,7 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
       }
       setTags(tmpTags);
       setSearchValue('');
-      doQuery();
+      doQuery(tmpTags);
     }
   };
 
