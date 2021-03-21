@@ -5,11 +5,6 @@ import moment from 'moment';
 
 export type RuleProColumns = ProColumns & { rules?: Rule[] };
 
-export type QueryPageBaseRequest = {
-  sorter?: string;
-  page?: PaginationPage;
-};
-
 export type PaginationPage = {
   current?: number;
   pageSize?: number;
@@ -190,3 +185,15 @@ export type FilterCondition = {
    */
   filterDataType: FilterConditionDataType;
 };
+
+export type QueryPageBaseRequest = {
+  sorter?: string;
+  page?: PaginationPage;
+};
+
+export type QueryPageConditionRequest = QueryPageBaseRequest & {
+  conditions?: FilterCondition[];
+};
+
+export type QueryPageParamRequest<T extends ParamsType> = T &
+  QueryPageBaseRequest & {};
