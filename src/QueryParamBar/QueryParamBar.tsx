@@ -140,7 +140,7 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
           key,
           oper,
           filterDataType: dataType,
-          filterValue: value,
+          filterValue: data,
         };
       },
     );
@@ -217,7 +217,6 @@ const QueryParamBar: React.FC<QueryParamBarProps> = (props) => {
   });
 
   const onModalConfirm = () => {
-    console.log(value);
     setItemValue(currentItem, value);
     setModalVisiable(false);
   };

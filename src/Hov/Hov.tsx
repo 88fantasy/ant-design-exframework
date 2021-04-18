@@ -8,7 +8,6 @@ import type {
   ApiResponsePage,
   FilterCondition,
   RequestConditionsType,
-  RequestParamsType,
 } from '../Typings';
 import show, { HovFuncProps } from './method';
 
