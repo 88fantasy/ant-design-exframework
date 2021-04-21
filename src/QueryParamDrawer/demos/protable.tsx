@@ -1,8 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { Form } from 'antd';
-import { QueryParamModal } from 'ant-design-exframework';
-import ProTable from '@ant-design/pro-table';
+import { QueryParamDrawer } from 'ant-design-exframework';
+import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import type { FormInstance } from 'antd/lib/form';
+import { FilterCondition, PaginationPage } from '@/Typings';
+import { SorterResult } from 'antd/lib/table/interface';
 
 type TableListParams = {
   sorter?: string;
@@ -39,7 +41,10 @@ const Index: React.FC = () => {
       actionRef={actionRef}
       rowKey="loggerId"
       onChange={(_, _filter, _sorter) => {
-        const sorterResult = _sorter as SorterResult<Logger>;
+        const sorterResult = _sorter as SorterResult<{
+          title: string;
+          content: string;
+        }>;
         if (sorterResult.field) {
           setSorter(`${sorterResult.field}_${sorterResult.order}`);
         }
@@ -49,7 +54,7 @@ const Index: React.FC = () => {
       }}
       toolbar={{
         search: (
-          <QueryParamModal
+          <QueryParamDrawer
             formRef={formRef}
             fields={[
               {

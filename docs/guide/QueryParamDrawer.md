@@ -1,4 +1,4 @@
-# 弹屏查询框(modal)
+# 抽屉查询框(Drawer)
 
 ## 何时使用
 
@@ -8,22 +8,22 @@
 ## 代码演示
 
 <code
-  src="../../src/QueryParamModal/demos/base.tsx"
+  src="../../src/QueryParamDrawer/demos/base.tsx"
   title="基本用法"
   desc="通过 `onChange` 获取查询条件">
 </code>
 
 <code
-  src="../../src/QueryParamModal/demos/protable.tsx"
+  src="../../src/QueryParamDrawer/demos/protable.tsx"
   title="结合 ProTable 使用"
   desc="通过 `onChange` 获取查询条件">
 </code>
 
 <API
-  src="../../src/QueryParamModal/QueryParamModal.tsx">
+  src="../../src/QueryParamDrawer/QueryParamDrawer.tsx">
 </API>
 
-### QueryParamModalField
+### QueryParamDrawerField
 
 | 参数             | 说明                         | 类型                                                                                                                                                           | 默认值 | 版本 |
 | ---------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---- |

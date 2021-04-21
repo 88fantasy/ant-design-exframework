@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import {
   Form,
   Table,
-  Modal,
+  Drawer,
   Button,
   Checkbox,
   Typography,
@@ -23,12 +23,12 @@ import {
 
 import './style';
 
-export type QueryParamModalFieldType = keyof typeof Components;
+export type QueryParamDrawerFieldType = keyof typeof Components;
 
 /**
  * 查询字段属性
  */
-export type QueryParamModalField = {
+export type QueryParamDrawerField = {
   /**
    * 提交字段
    */
@@ -40,7 +40,7 @@ export type QueryParamModalField = {
   /**
    * 编辑器类型
    */
-  type: QueryParamModalFieldType;
+  type: QueryParamDrawerFieldType;
 
   /**
    * 校验规则
@@ -104,10 +104,10 @@ export type FilerConditionRow = {
   /**
    * 字段设置
    */
-  field: QueryParamModalField;
+  field: QueryParamDrawerField;
 };
 
-export type QueryParamModalProps = {
+export type QueryParamDrawerProps = {
   /**
    * 查询框标题
    * @default 高级查询
@@ -122,7 +122,7 @@ export type QueryParamModalProps = {
    * 查询框字段信息
    * @default []
    */
-  fields: QueryParamModalField[];
+  fields: QueryParamDrawerField[];
   /**
    * 查询框 Form 的引用
    */
@@ -165,7 +165,7 @@ const getOperLabel = (oper: FilterConditionOperType) => {
 };
 
 const getDefaultFieldDataType = (
-  type: QueryParamModalFieldType,
+  type: QueryParamDrawerFieldType,
 ): FilterConditionDataType => {
   switch (type) {
     case 'ProFormSelect':
@@ -181,7 +181,7 @@ const getDefaultFieldDataType = (
   }
 };
 
-const getDefaultOpers = (field: QueryParamModalField): string[] => {
+const getDefaultOpers = (field: QueryParamDrawerField): string[] => {
   if (field.opers) {
     return field.opers;
   } else {
@@ -201,7 +201,7 @@ const getDefaultOpers = (field: QueryParamModalField): string[] => {
   }
 };
 
-const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
+const QueryParamDrawer: React.FC<QueryParamDrawerProps> = (props) => {
   const {
     title = '高级查询',
     fields = [],
@@ -216,7 +216,7 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
   const forgetUpdate = () => {
     setTimeout(() => updateState(true));
   };
-  const showModal = () => {
+  const show = () => {
     setVisible(true);
   };
 
@@ -225,7 +225,7 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
   };
 
   const renderTableField = (
-    item: QueryParamModalField,
+    item: QueryParamDrawerField,
     index: number,
     _record: any,
   ) => {
@@ -313,6 +313,7 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
       },
     },
   ];
+
   const datas: FilerConditionRow[] = fields.map((field) => {
     return {
       checkbox: false,
@@ -322,52 +323,66 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
       field,
     };
   });
+
+  const doQuery = async () => {
+    const conditions: FilterCondition[] = [];
+    await form
+      .validateFields()
+      .then(({ values }: { values: FilerConditionRowValue[] }) => {
+        values
+          .filter((item) => item.checkbox)
+          .forEach((item) => {
+            const type = item.editor as QueryParamDrawerFieldType;
+            switch (type) {
+              case 'ProFormDateTimeRangePicker':
+                item.value = [
+                  (item.value[0] as Moment).format(defaultMomentDateTime),
+                  (item.value[1] as Moment).format(defaultMomentDateTime),
+                ];
+                break;
+              default:
+            }
+            conditions.push({
+              key: item.key,
+              oper: item.oper,
+              filterValue: item.value,
+              filterDataType: getDefaultFieldDataType(type),
+            });
+          });
+      })
+      .catch((errorInfo) => {
+        message.error(`条件校验失败: ${errorInfo}`);
+      });
+    setVisible(false);
+    onFinish(conditions);
+  };
+
   return (
     <>
-      <Button type="default" onClick={showModal}>
+      <Button type="default" onClick={show}>
         {title}
       </Button>
-      <Modal
+      <Drawer
         title={title}
         visible={visible}
         forceRender={true}
-        centered
-        bodyStyle={{ padding: 0 }}
-        onOk={async () => {
-          const conditions: FilterCondition[] = [];
-          await form
-            .validateFields()
-            .then(({ values }: { values: FilerConditionRowValue[] }) => {
-              values
-                .filter((item) => item.checkbox)
-                .forEach((item) => {
-                  const type = item.editor as QueryParamModalFieldType;
-                  switch (type) {
-                    case 'ProFormDateTimeRangePicker':
-                      item.value = [
-                        (item.value[0] as Moment).format(defaultMomentDateTime),
-                        (item.value[1] as Moment).format(defaultMomentDateTime),
-                      ];
-                      break;
-                    default:
-                  }
-                  conditions.push({
-                    key: item.key,
-                    oper: item.oper,
-                    filterValue: item.value,
-                    filterDataType: getDefaultFieldDataType(type),
-                  });
-                });
-            })
-            .catch((errorInfo) => {
-              message.error(`条件校验失败: ${errorInfo}`);
-            });
-          setVisible(false);
-          onFinish(conditions);
-        }}
-        onCancel={handleCancel}
-        width={'60%'}
-        okText="查询"
+        width="60%"
+        bodyStyle={{ paddingBottom: 80 }}
+        onClose={handleCancel}
+        footer={
+          <div
+            style={{
+              textAlign: 'right',
+            }}
+          >
+            <Button onClick={handleCancel} style={{ marginRight: 8 }}>
+              取消
+            </Button>
+            <Button onClick={doQuery} type="primary">
+              查询
+            </Button>
+          </div>
+        }
       >
         <div className="base-form">
           <Form form={form} name="basic" initialValues={{}}>
@@ -389,8 +404,8 @@ const QueryParamModal: React.FC<QueryParamModalProps> = (props) => {
             <Table columns={columns} dataSource={datas} pagination={false} />
           </Form>
         </div>
-      </Modal>
+      </Drawer>
     </>
   );
 };
-export default QueryParamModal;
+export default QueryParamDrawer;

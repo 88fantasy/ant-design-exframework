@@ -1,9 +1,9 @@
 import React from 'react';
-import { QueryParamModal } from 'ant-design-exframework';
+import { QueryParamDrawer } from 'ant-design-exframework';
 
 const Index: React.FC = () => {
   return (
-    <QueryParamModal
+    <QueryParamDrawer
       fields={[
         {
           key: 'moduleCode',
