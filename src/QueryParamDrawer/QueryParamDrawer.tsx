@@ -114,6 +114,11 @@ export type QueryParamDrawerProps = {
    */
   title?: string;
   /**
+   * 宽度
+   * @default 60%
+   */
+  width?: string;
+  /**
    * 显示类型
    * @default table
    */
@@ -204,6 +209,7 @@ const getDefaultOpers = (field: QueryParamDrawerField): string[] => {
 const QueryParamDrawer: React.FC<QueryParamDrawerProps> = (props) => {
   const {
     title = '高级查询',
+    width = '60%',
     fields = [],
     formRef: propsFormRef,
     onFinish,
@@ -366,7 +372,7 @@ const QueryParamDrawer: React.FC<QueryParamDrawerProps> = (props) => {
         title={title}
         visible={visible}
         forceRender={true}
-        width="60%"
+        width={width}
         bodyStyle={{ paddingBottom: 80 }}
         onClose={handleCancel}
         footer={
