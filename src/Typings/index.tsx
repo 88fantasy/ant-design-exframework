@@ -108,6 +108,10 @@ enum FilterConditionOper {
    */
   IN = 'IN',
   /**
+   * 包含
+   */
+  NOT_IN = 'NOT_IN',
+  /**
    * 匹配
    */
   MATCHING = 'MATCHING',
